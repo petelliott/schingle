@@ -34,16 +34,16 @@
         (delete "" (intersperse '* (string-split elem #\*)))
         elem))))
 
-(define* (compile-routes routelist #:optional dflt)
+(define* (compile-routes routelist #:optional dflt (onto (make-hash-table)))
   "like compile-routemap, but returns an alist of args and value pair"
-  (let ((rm (compile-routemap routelist dflt)))
+  (let ((rm (compile-routemap routelist #f onto)))
     (lambda (mpath)
       (let ((ret (rm mpath)))
-        (if (pair? ret)
+        (if ret
           (cons
             (parse-params (car ret) mpath)
             (cdr ret))
-          ret)))))
+          dflt)))))
 
 (define (parse-params routespec mpath)
   "produces an alist of args from the path and the spec"
