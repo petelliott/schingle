@@ -3,10 +3,8 @@
 ;;; it is recomened that you use the regular schingle interface.
 (define-module (schingle sinatra)
   #:use-module (web server)
-  #:use-module (web request)
-  #:use-module (web uri)
-  #:use-module (web response)
   #:use-module (schingle route)
+  #:use-module (schingle handler)
   #:export (GET
             HEAD
             POST
@@ -19,14 +17,6 @@
             run-sinatra))
 
 (define *sinatra-routes* '())
-
-(define sinatra-404
-  `(() . ,(lambda (params request body)
-            (values
-              (build-response
-                #:code 404
-                #:headers '((content-type . (text/plain))))
-              "404 not found"))))
 
 (define (add-sinatra-route route proc)
   "adds route/proc to the sinatra routes"
@@ -86,11 +76,6 @@
      (sinatra-request PATCH path (params request body) body* ...))))
 
 (define* (run-sinatra #:optional (impl 'http) (open-params '()))
-  (let ((fn (compile-routes *sinatra-routes* sinatra-404)))
-    (run-server
-      (lambda (request body)
-        (let ((ret (fn (cons (request-method request) (uri-path (request-uri request))))))
-          ((cdr ret) (car ret) request body))))
-    impl open-params))
-
-
+  (run-server
+    (routes->handler (compile-routes *sinatra-routes*))
+  impl open-params))
