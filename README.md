@@ -9,26 +9,25 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 ```scheme
 (use-modules (schingle schingle))
 
-(define handlers
-  (list
+(define-handlers handlers
 
-(GET "/hello"
+(GET /hello
      (lambda (request body)
        (values '((content-type . (text/plain)))
                "Hello World!")))
 
-(GET "/hello/:name"
+(GET /hello/:name
      (lambda* (request body #:key :name)
        (values '((content-type . (text/plain)))
                 (format #f "Hello, ~a!" :name))))
 
-(GET "/error"
+(GET /error
      (lambda (request body)
        (car '()) ; cause an error to invoke 500 handler
        (values '((content-type . (text/plain)))
                "this shouldn't happen")))
 
-))
+)
 
 (run-schingle handlers)
 ```
