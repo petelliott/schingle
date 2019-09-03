@@ -7,7 +7,10 @@
   #:export (handle-content
             transform-body
             plain
-            json))
+            json
+            xml
+            html
+            sexp))
 
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
@@ -65,3 +68,20 @@
   (values
     (apply build-content-response '(application/json) rest)
     (scm->json-string body)))
+
+(define (xml body . rest)
+  (values
+    (apply build-content-response '(application/xml) rest)
+    (call-with-output-string
+      (lambda (port)
+        (sxml->xml body port)))))
+
+(define (html body . rest)
+  (apply xml body rest))
+
+(define (sexp body . rest)
+  (values
+    (apply build-content-response '(application/s.s-expression) rest)
+    (call-with-output-string
+      (lambda (port)
+        (write body port)))))

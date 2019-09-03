@@ -25,9 +25,27 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (car '()) ; cause an error to invoke 500 handler
        (plain "this shouldn't happen")))
 
+(POST /post
+     (lambda (request body)
+       (write body)
+       (newline)
+       (plain "Hello World!")))
+
 (GET /json/:value
      (lambda* (request body #:key :value)
        (json `((value . ,:value)))))
+
+(GET /xml/:value
+     (lambda* (request body #:key :value)
+       (xml `(*TOP* (value ,:value)))))
+
+(GET /html/:value
+     (lambda* (request body #:key :value)
+       (xml `(*TOP* (html (p ,:value))))))
+
+(GET /sexp/:value
+     (lambda* (request body #:key :value)
+       (sexp `((value . ,:value)))))
 
 )
 
