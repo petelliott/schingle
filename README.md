@@ -26,10 +26,10 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (plain "this shouldn't happen")))
 
 (POST /post
-     (lambda (request body)
-       (write body)
-       (newline)
-       (plain "Hello World!")))
+      (lambda (request body)
+        (write body)
+        (newline)
+        (plain "Hello World!")))
 
 (GET /json/:value
      (lambda* (request body #:key :value)

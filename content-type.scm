@@ -81,7 +81,7 @@
 
 (define (sexp body . rest)
   (values
-    (apply build-content-response '(application/s.s-expression) rest)
+    (apply build-content-response '(application/x.s-expression) rest)
     (call-with-output-string
       (lambda (port)
         (write body port)))))
