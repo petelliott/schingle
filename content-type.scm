@@ -77,7 +77,11 @@
         (sxml->xml body port)))))
 
 (define (html body . rest)
-  (apply xml body rest))
+  (values
+    (apply build-content-response '(text/html) rest)
+    (call-with-output-string
+      (lambda (port)
+        (sxml->xml body port)))))
 
 (define (sexp body . rest)
   (values
