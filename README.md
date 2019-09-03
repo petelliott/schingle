@@ -37,11 +37,11 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 (GET /xml/:value
      (lambda* (request body #:key :value)
-       (xml `(*TOP* (value ,:value)))))
+       (xml `(value ,:value))))
 
 (GET /html/:value
      (lambda* (request body #:key :value)
-       (xml `(*TOP* (html (p ,:value))))))
+       (xml `(html (p ,:value)))))
 
 (GET /sexp/:value
      (lambda* (request body #:key :value)
