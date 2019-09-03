@@ -5,8 +5,8 @@
   #:use-module (json)
   #:use-module (sxml simple)
   #:export (handle-content
-            transform-body))
-
+            transform-body
+            plain))
 
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
@@ -38,3 +38,24 @@
          (lambda (port)
            (read port))))
       (else body))))
+
+(define (dcons a b rest)
+  (cons a (cons b rest)))
+
+(define* (build-content-response content #:key (version '(1 . 1))
+                                               (code 200)
+                                               (reason-phrase #f)
+                                               (headers '())
+                                               (port #f)
+                                               (validate-headers? #t))
+  (build-response #:version version
+                  #:code code
+                  #:reason-phrase reason-phrase
+                  #:headers (acons 'content-type content headers)
+                  #:port port
+                  #:validate-headers? validate-headers?))
+
+(define (plain body . rest)
+  (values
+    (apply build-content-response '(text/plain) rest)
+    body))

@@ -2,6 +2,7 @@
   #:use-module (web server)
   #:use-module (schingle route)
   #:use-module (schingle handler)
+  #:use-module (schingle content-type)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GETs HEADs POSTs PUTs DELETEs TRACEs
@@ -20,11 +21,12 @@
         (alist-to-args (cdr alist))))))
 
 (define (schingle-route method route proc)
-  (cons
-    (cons method route)
-    (lambda (params request body)
-      (apply proc request body
-             (alist-to-args params)))))
+  (let ((nproc (handle-content proc)))
+    (cons
+      (cons method route)
+      (lambda (params request body)
+        (apply nproc request body
+               (alist-to-args params))))))
 
 (define (GETs route proc)
   (schingle-route 'GET route proc))
