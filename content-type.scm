@@ -6,19 +6,20 @@
   #:use-module (sxml simple)
   #:export (handle-content
             transform-body
-            plain))
+            plain
+            json))
 
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
-  (lambda (request body)
-    (proc request (transform-body request body))))
+  (lambda (request body . rest)
+    (apply proc request (transform-body request body) rest)))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \
   content-type"
   (let* ((ctype (request-content-type request))
-         (type (car ctype))
-         (args (cdr ctype)))
+         (type (and ctype (car ctype)))
+         (args (and ctype (cdr ctype))))
     (case type
       ((text/plain)
        (bytevector->string
@@ -59,3 +60,8 @@
   (values
     (apply build-content-response '(text/plain) rest)
     body))
+
+(define (json body . rest)
+  (values
+    (apply build-content-response '(application/json) rest)
+    (scm->json-string body)))

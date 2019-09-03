@@ -25,6 +25,10 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (car '()) ; cause an error to invoke 500 handler
        (plain "this shouldn't happen")))
 
+(GET /json/:value
+     (lambda* (request body #:key :value)
+       (json `((value . ,:value)))))
+
 )
 
 (run-schingle handlers)
@@ -37,20 +41,18 @@ schingle also has a sinatra-like interface for simple web services.
 ### example
 
 ```scheme
-(use-modules (schingle sinatra))
+(use-modules (schingle sinatra)
+             (schingle content-type))
 
 (GET "/hello" (params request body) do
-  (values '((content-type . (text/plain)))
-          "Hello World!"))
+  (plain "Hello World!"))
 
 (GET "/hello/:name" (params request body) do
-  (values '((content-type . (text/plain)))
-          (format #f "Hello, ~a!" (cdr (assoc ':name params)))))
+  (plain (format #f "Hello, ~a!" (cdr (assoc ':name params)))))
 
 (GET "/error" (params request body) do
   (car '()) ; cause an error to invoke 500 handler
-  (values '((content-type . (text/plain)))
-          "this shouldn't happen"))
+  (plain "this shouldn't happen"))
 
 (run-sinatra)
 ```
