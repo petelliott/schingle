@@ -1,10 +1,12 @@
 (define-module (schingle content-type)
   #:use-module (web request)
   #:use-module (web response)
+  #:use-module (web uri)
   #:use-module (ice-9 iconv)
   #:use-module (json)
   #:use-module (sxml simple)
   #:use-module (schingle query)
+  #:use-module (schingle handler)
   #:export (handle-content
             transform-body
             plain
@@ -17,7 +19,21 @@
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
   (lambda (request body . rest)
-    (apply proc request (transform-body request body) rest)))
+    (let ((nbody (catch #t
+                       (lambda ()
+                         (transform-body request body))
+                       (lambda (key . args)
+                         (write args)
+                         (newline)
+                         (write key)
+                         (newline)
+                         (format #t "malformed body in request to ~A: "
+                                 (uri-path (request-uri request)))
+                         (safe-display-error key args)
+                         #f))))
+      (if nbody
+        (apply proc request (transform-body request body) rest)
+        (400handler request body)))))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \

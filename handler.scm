@@ -3,9 +3,19 @@
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)
-  #:export (404handler
+  #:use-module (ice-9 match)
+  #:export (400handler
+            404handler
             500handler
-            routes->handler))
+            routes->handler
+            safe-display-error))
+
+(define (400handler request body)
+  (values
+    (build-response
+      #:code 400
+      #:headers '((content-type . (text/plain))))
+    "400 Bad Request"))
 
 (define (404handler request body)
   (values
@@ -38,5 +48,13 @@
         ; pre-unwind handler
         (lambda (key . args)
           (format #t "error in request to ~A: " (uri-path (request-uri request)))
-          (display-error #f (current-output-port)
-                         (car args) (cadr args) (caddr args) #f))))))
+          (safe-display-error key args))))))
+
+(define (safe-display-error key args)
+  "displays the key and args of the values of a catch"
+  (match args
+    ((subr msg args . rest)
+     (display-error #f (current-output-port) subr msg args rest))
+    (else
+      (format #t "Throw to key `~a' with args `~s'\n"
+                 key args))))
