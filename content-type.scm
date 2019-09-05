@@ -11,7 +11,8 @@
             json
             xml
             html
-            sexp))
+            sexp
+            urlencoded))
 
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
@@ -94,3 +95,10 @@
     (call-with-output-string
       (lambda (port)
         (write body port)))))
+
+(define (urlencoded body . rest)
+  "returns a urlencoded response/body. converts alist body to url encoded. \
+  takes the same keyword args as build-response"
+  (values
+    (apply build-content-response '(application/x-www-form-urlencoded) rest)
+    (alist->query body)))
