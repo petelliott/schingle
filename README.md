@@ -14,7 +14,8 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 ```scheme
 (use-modules (schingle schingle)
-             (schingle content-type))
+             (schingle content-type)
+             (schingle query))
 
 (define-handlers handlers
 
@@ -31,11 +32,21 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (car '()) ; cause an error to invoke 500 handler
        (plain "this shouldn't happen")))
 
-(POST /post
+; html form support
+
+(GET /form
+     (lambda (request body)
+       (let ((query (req-query request)))
+         (plain (format #f "Hello, ~a ~a!"
+                        (assoc-ref query "firstname")
+                        (assoc-ref query "lastname"))))))
+
+(POST /form
       (lambda (request body)
-        (write body)
-        (newline)
-        (plain "Hello World!")))
+        (plain (format #f "Hello, ~a ~a!"
+                       (assoc-ref body "firstname")
+                       (assoc-ref body "lastname")))))
+; simple return types
 
 (GET /json/:value
      (lambda* (request body #:key :value)
@@ -47,11 +58,15 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 (GET /html/:value
      (lambda* (request body #:key :value)
-       (html `(html (p ,:value)))))
+       (html `((html (p ,:value))))))
 
 (GET /sexp/:value
      (lambda* (request body #:key :value)
        (sexp `((value . ,:value)))))
+
+(GET /urlencoded/:value
+     (lambda* (request body #:key :value)
+       (urlencoded `((value . ,:value)))))
 
 )
 
