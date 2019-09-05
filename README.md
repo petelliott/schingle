@@ -40,6 +40,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
          (plain (format #f "Hello, ~a ~a!"
                         (assoc-ref query "firstname")
                         (assoc-ref query "lastname"))))))
+
+(POST /form
+      (lambda (request body)
+        (plain (format #f "Hello, ~a ~a!"
+                       (assoc-ref body "firstname")
+                       (assoc-ref body "lastname")))))
 ; simple return types
 
 (GET /json/:value
