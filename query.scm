@@ -1,8 +1,10 @@
 (define-module (schingle query)
   #:use-module (srfi srfi-1)
   #:use-module (web uri)
+  #:use-module (web request)
   #:export (query->alist
-            alist->query))
+            alist->query
+            req-query))
 
 
 (define (query->alist qstring)
@@ -30,3 +32,6 @@
     (lambda (port)
       (display obj port))))
 
+(define (req-query request)
+  "returns the request's query string as an alist"
+  (query->alist (uri-query (request-uri request))))
