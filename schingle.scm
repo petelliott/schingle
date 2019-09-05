@@ -12,6 +12,7 @@
             define-handlers))
 
 (define (alist-to-args alist)
+  "converts alist like '((a . b) (c . d)) to '(#:a b #:c d)"
   (if (null? alist)
     '()
     (cons
@@ -21,6 +22,7 @@
         (alist-to-args (cdr alist))))))
 
 (define (schingle-route method route proc)
+  "create a route-entry like '((METHOD . /route) . #<proc>)"
   (let ((nproc (handle-content proc)))
     (cons
       (cons method route)
@@ -92,11 +94,14 @@
   (PATCHs (symbol->string (quote route)) proc))
 
 (define* (make-handler routes #:key (h404 404handler) (h500 500handler))
+  "construct a guile web compatible handler with a list of route/handler \
+  pairs and optional 404 and 500 error handlers"
   (routes->handler (compile-routes routes) #:h404 h404 #:h500 h500))
 
 (define* (run-schingle routes
                        #:optional (impl 'http) (open-params '())
                        #:key (h404 404handler) (h500 500handler))
+  "convinience function that combines making the handler and starting the server."
   (run-server
     (make-handler routes #:h404 h404 #:h500 h500)
     impl open-params))

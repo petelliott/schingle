@@ -52,6 +52,8 @@
                                                (headers '())
                                                (port #f)
                                                (validate-headers? #t))
+  "takes the same arguments as build-response but has a seperate argument for \
+  content-type and other headers"
   (build-response #:version version
                   #:code code
                   #:reason-phrase reason-phrase
@@ -60,16 +62,22 @@
                   #:validate-headers? validate-headers?))
 
 (define (plain body . rest)
+  "returns a plain text response/body, takes the same keyword args as \
+  build-response"
   (values
     (apply build-content-response '(text/plain) rest)
     body))
 
 (define (json body . rest)
+  "returns a json response/body. converts s-expression body to json. takes \
+  the same keyword args as build-response"
   (values
     (apply build-content-response '(application/json) rest)
     (scm->json-string body)))
 
 (define (xml body . rest)
+  "returns an xml response/body. converts SXML body to xml. takes \
+  the same keyword args as build-response"
   (values
     (apply build-content-response '(application/xml) rest)
     (call-with-output-string
@@ -77,6 +85,8 @@
         (sxml->xml body port)))))
 
 (define (html body . rest)
+  "returns an html response/body. converts SXML body to html. takes \
+  the same keyword args as build-response"
   (values
     (apply build-content-response '(text/html) rest)
     (call-with-output-string
@@ -84,6 +94,8 @@
         (sxml->xml body port)))))
 
 (define (sexp body . rest)
+  "returns an s-expression response/body. seriallizes s-expression body.
+  takes the same keyword args as build-response"
   (values
     (apply build-content-response '(application/x.s-expression) rest)
     (call-with-output-string
