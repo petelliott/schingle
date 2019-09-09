@@ -8,7 +8,8 @@
              (web uri)
              (web request)
              (web response)
-             (ice-9 iconv))
+             (ice-9 iconv)
+             (ice-9 binary-ports))
 
 (define (make-handlers)
   (make-handler (list
@@ -135,3 +136,16 @@
                 (handler (build-request (string->uri "http://localhost/urlencoded/blah")) #f)))
     (and (check-response r #:code 200 #:headers '((content-type application/x-www-form-urlencoded)))
          (equal? b "value=blah"))))
+
+(define (read-file fname)
+  "read a file to a byte-vector"
+  (call-with-input-file
+    fname
+    (lambda (port)
+      (get-bytevector-all port))))
+
+(define-test (schingle integration static)
+  (let-values (((r b)
+                (handler (build-request (string->uri "http://localhost/schingle/static.scm")) #f)))
+    (and (check-response r #:code 200 #:headers '((content-type text/plain)))
+         (equal? b (read-file "static.scm")))))
