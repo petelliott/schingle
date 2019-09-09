@@ -15,6 +15,7 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 ```scheme
 (use-modules (schingle schingle)
              (schingle content-type)
+             (schingle static)
              (schingle query))
 
 (define-handlers handlers
@@ -67,6 +68,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 (GET /urlencoded/:value
      (lambda* (request body #:key :value)
        (urlencoded `((value . ,:value)))))
+
+; static files
+
+(GET /schingle/:file
+     (lambda* (request body #:key :file)
+       (static 'text/plain :file)))
 
 )
 
