@@ -19,19 +19,16 @@
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
   (lambda (request body . rest)
-    (let ((nbody (catch #t
-                       (lambda ()
-                         (transform-body request body))
-                       (lambda (key . args)
-                         (write args)
-                         (newline)
-                         (write key)
-                         (newline)
-                         (format #t "malformed body in request to ~A: "
-                                 (uri-path (request-uri request)))
-                         (safe-display-error key args)
-                         #f))))
-      (if nbody
+    (let* ((failure (gensym))
+           (nbody (catch #t
+                    (lambda ()
+                      (transform-body request body))
+                    (lambda (key . args)
+                      (format #t "malformed body in request to ~A: "
+                              (uri-path (request-uri request)))
+                      (safe-display-error key args)
+                      failure))))
+      (if (not (equal? nbody failure))
         (apply proc request (transform-body request body) rest)
         (400handler request body)))))
 
