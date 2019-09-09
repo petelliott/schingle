@@ -5,6 +5,6 @@
              (schingle query)
              (schingle route)
              (schingle schingle)
-             (schingle sinatra)
+             ;(schingle sinatra)
              (schingle static)
              (schingle util))
