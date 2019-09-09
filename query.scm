@@ -6,6 +6,11 @@
             alist->query
             req-query))
 
+(define (empty-split str char)
+  "like string-split, but empty strings and #f become '()"
+  (if (or (not str) (string-null? str))
+    '()
+    (string-split str char)))
 
 (define (query->alist qstring)
   "converts an application/x-www-form-urlencoded query string to an alist"
@@ -14,7 +19,7 @@
            (cons
              (uri-decode (first split))
              (uri-decode (second split)))))
-       (string-split qstring #\&)))
+       (empty-split qstring #\&)))
 
 (define (alist->query alist)
   "converts an alist to an application/x-www-form-urlencoded query string"
