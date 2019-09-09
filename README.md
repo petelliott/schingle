@@ -10,6 +10,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 2) clone this repository into somewhere on guile's `%load-path`
 
+## testing
+
+1) install [guest](https://github.com/Petelliott/guest)
+
+2) run `guest test/`
+
 ## schingle interface
 
 ```scheme
