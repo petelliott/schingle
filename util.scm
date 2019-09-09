@@ -2,7 +2,9 @@
 (define-module (schingle util)
   #:export (multi-map
             intersperse
-            enlist))
+            enlist
+            to-string
+            alist->args))
 
 (define (multi-map lst . procs)
   "maps lst through procs, starting with the first function as the innermost"
@@ -23,32 +25,19 @@
         item
         (intersperse item (cdr lst))))))
 
-#|
-;TODO unused methods queued for deletion
-(define (enlist item)
-  "wrap an item in a list if it is not a list"
-  (if (list? item)
-    item
-    (list item)))
+(define (to-string obj)
+  "converts an object to a string via display.\
+  not reversable"
+  (call-with-output-string
+    (lambda (port)
+      (display obj port))))
 
-(define (alist-app key alist fn)
-  "return a new alist where (assoc key list) has fn applied to it.\
-  supports duplicates"
-  (display alist)
-  (newline)
+(define (alist->args alist)
+  "converts alist like '((a . b) (c . d)) to '(#:a b #:c d)"
   (if (null? alist)
-      alist
+    '()
+    (cons
+      (symbol->keyword (caar alist))
       (cons
-        (if (equal? (caar alist) key)
-          (cons (caar alist) (fn (cdar alist)))
-          (car alist))
-        (alist-app key (cdr alist) fn))))
-
-(define (collate-keys alist #:optional (res '()))
-  "converts an alist keyed by lists to an alist keyed by the first elements of\
-  the list"
-  (cond
-    ((null? alist) res)
-    ((assoc (caar alist) res)
-     (collate-keys (cdr alist) (alist-app (caar alist)
-|#
+        (cdar alist)
+        (alist->args (cdr alist))))))

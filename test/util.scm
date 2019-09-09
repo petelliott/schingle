@@ -12,3 +12,8 @@
   (equal? (intersperse '* '(a)) '(a))
   (equal? (intersperse '* '(a b c)) '(a * b * c))
   (equal? (intersperse '* '(a b c d)) '(a * b * c * d)))
+
+(define-test (schingle util alist->args)
+  (equal? (alist->args '()) '())
+  (equal? (alist->args '((a . b))) '(#:a b))
+  (equal? (alist->args '((a . b) (c . d))) '(#:a b #:c d)))

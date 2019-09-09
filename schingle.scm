@@ -1,4 +1,5 @@
 (define-module (schingle schingle)
+  #:use-module (schingle util)
   #:use-module (web server)
   #:use-module (schingle route)
   #:use-module (schingle handler)
@@ -11,16 +12,6 @@
             run-schingle
             define-handlers))
 
-(define (alist-to-args alist)
-  "converts alist like '((a . b) (c . d)) to '(#:a b #:c d)"
-  (if (null? alist)
-    '()
-    (cons
-      (symbol->keyword (caar alist))
-      (cons
-        (cdar alist)
-        (alist-to-args (cdr alist))))))
-
 (define (schingle-route method route proc)
   "create a route-entry like '((METHOD . /route) . #<proc>)"
   (let ((nproc (handle-content proc)))
@@ -28,7 +19,7 @@
       (cons method route)
       (lambda (params request body)
         (apply nproc request body
-               (alist-to-args params))))))
+               (alist->args params))))))
 
 (define (GETs route proc)
   (schingle-route 'GET route proc))
