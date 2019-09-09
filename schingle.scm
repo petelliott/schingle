@@ -86,7 +86,7 @@
   (CONNECT route proc)
   (CONNECTs (symbol->string (quote route)) proc))
 
-(define (PATCH route proc)
+(define (PATCHs route proc)
   (schingle-route 'PATCH route proc))
 
 (define-syntax-rule
