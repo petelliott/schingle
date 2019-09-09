@@ -3,10 +3,9 @@ language: generic
 
 install:
   - curl https://raw.githubusercontent.com/Petelliott/guest/master/install.sh | bash
-  - export GUILE_LOAD_PATH=$(realpath ..)
 
 script:
-  - guest test/ --cover "$(printf "schingle/%s " *.scm)" --cover-out coverage.info
+  - GUILE_LOAD_PATH=$(realpath ..) guest test/ --cover "$(printf "schingle/%s " *.scm)" --cover-out coverage.info
 
 
 after_success:
