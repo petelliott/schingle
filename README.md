@@ -1,5 +1,8 @@
 # schingle
 
+[![Build Status](https://travis-ci.com/Petelliott/schingle.svg?branch=master)](https://travis-ci.com/Petelliott/schingle)
+[![Coverage Status](https://coveralls.io/repos/github/Petelliott/schingle/badge.svg?branch=master)](https://coveralls.io/github/Petelliott/schingle?branch=master)
+
 schingle (pronounced shingle) is a tiny web framework for guile inspired by
 [ningle](https://github.com/fukamachi/ningle) (hence "SCHeme nINGLE") and
 [sinatra](https://github.com/sinatra/sinatra). It is licensed under the LGPLv3.
@@ -9,6 +12,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 1) install [guile-json](https://github.com/aconchillo/guile-json)
 
 2) clone this repository into somewhere on guile's `%load-path`
+
+## testing
+
+1) install [guest](https://github.com/Petelliott/guest)
+
+2) run `guest test/`
 
 ## schingle interface
 

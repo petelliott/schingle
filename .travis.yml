@@ -1,0 +1,14 @@
+dist: bionic
+language: generic
+
+install:
+  - curl https://raw.githubusercontent.com/Petelliott/guest/master/install.sh | bash
+  - curl -Lv http://download.savannah.gnu.org/releases/guile-json/guile-json-3.1.0.tar.gz | tar xzv
+  - (cd guile-json*; ./configure --prefix=/usr; make; sudo make install)
+
+script:
+  - GUILE_LOAD_PATH=$(realpath ..) guest test/ --cover "$(printf "schingle/%s " *.scm)" --cover-out coverage.info
+
+
+after_success:
+  - coveralls.sh coverage.info
