@@ -16,6 +16,8 @@
             PATCH
             run-sinatra))
 
+(display "WARNING: schingle's sinatra interface is deprecated\n")
+
 (define *sinatra-routes* '())
 
 (define (add-sinatra-route route proc)
