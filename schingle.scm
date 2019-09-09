@@ -93,17 +93,15 @@
   (PATCH route proc)
   (PATCHs (symbol->string (quote route)) proc))
 
-(define* (make-handler routes #:key (h404 404handler) (h500 500handler))
+(define (make-handler routes)
   "construct a guile web compatible handler with a list of route/handler \
   pairs and optional 404 and 500 error handlers"
-  (routes->handler (compile-routes routes) #:h404 h404 #:h500 h500))
+  (routes->handler (compile-routes routes)))
 
-(define* (run-schingle routes
-                       #:optional (impl 'http) (open-params '())
-                       #:key (h404 404handler) (h500 500handler))
+(define* (run-schingle routes #:optional (impl 'http) (open-params '()))
   "convinience function that combines making the handler and starting the server."
   (run-server
-    (make-handler routes #:h404 h404 #:h500 h500)
+    (make-handler routes)
     impl open-params))
 
 (define-syntax-rule

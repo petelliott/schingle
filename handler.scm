@@ -10,28 +10,34 @@
             routes->handler
             safe-display-error))
 
-(define (400handler request body)
-  (values
-    (build-response
-      #:code 400
-      #:headers '((content-type . (text/plain))))
-    "400 Bad Request"))
+(define 400handler
+  (make-parameter
+    (lambda (request body)
+      (values
+        (build-response
+          #:code 400
+          #:headers '((content-type . (text/plain))))
+        "400 Bad Request"))))
 
-(define (404handler request body)
-  (values
-    (build-response
-      #:code 404
-      #:headers '((content-type . (text/plain))))
-    "404 Not Found"))
+(define 404handler
+  (make-parameter
+    (lambda (request body)
+      (values
+        (build-response
+          #:code 404
+          #:headers '((content-type . (text/plain))))
+        "404 Not Found"))))
 
-(define (500handler request body)
-  (values
-    (build-response
-      #:code 500
-      #:headers '((content-type . (text/plain))))
-    "500 Internal Server Error"))
+(define 500handler
+  (make-parameter
+    (lambda (request body)
+      (values
+        (build-response
+          #:code 500
+          #:headers '((content-type . (text/plain))))
+        "500 Internal Server Error"))))
 
-(define* (routes->handler routefn #:key (h404 404handler) (h500 500handler))
+(define (routes->handler routefn)
   "produces a handler compatible with run-server from a compiled route table\
   with (params reqeust body) args"
   (lambda (request body)
@@ -41,10 +47,10 @@
         (lambda ()
           (if handler
             ((cdr handler) (car handler) request body)
-            (h404 request body)))
+            ((404handler) request body)))
         ; post-unwind handler
         (lambda (key . args)
-          (h500 request body))
+          ((500handler) request body))
         ; pre-unwind handler
         (lambda (key . args)
           (format #t "error in request to ~A: " (uri-path (request-uri request)))

@@ -30,7 +30,7 @@
                       failure))))
       (if (not (equal? nbody failure))
         (apply proc request (transform-body request body) rest)
-        (400handler request body)))))
+        ((400handler) request body)))))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \

@@ -30,5 +30,5 @@
           #:code 200
           #:headers `((content-type . (,content-type))))
         data)
-      (404handler #f #f))))
+      ((404handler) #f #f))))
 

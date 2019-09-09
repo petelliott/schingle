@@ -16,6 +16,7 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 (use-modules (schingle schingle)
              (schingle content-type)
              (schingle static)
+             (schingle handler)
              (schingle query))
 
 (define-handlers handlers
@@ -77,7 +78,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 )
 
-(run-schingle handlers)
+(define (custom404 request body)
+  "a custom 404 handler. custom 500 and 400 handlers can also be defined"
+  (plain "oopsie" #:code 404))
+
+(parameterize ((404handler custom404))
+  (run-schingle handlers))
 ```
 
 ## sinatra-like interface
