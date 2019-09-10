@@ -64,9 +64,9 @@
 
     ; static files
 
-    (GET /schingle/:file
-         (lambda* (request body #:key :file)
-           (static 'text/plain :file))))))
+    (GET /schingle/*.scm
+         (lambda* (request body #:optional :file)
+           (static 'text/plain (string-append :file ".scm")))))))
 
 (define-test (schingle integration sanity)
   (make-handlers))
@@ -146,6 +146,13 @@
 
 (define-test (schingle integration static)
   (let-values (((r b)
+                (handler (build-request (string->uri "http://localhost/schingle/COPYING")) #f)))
+    (check-response r #:code 404 #:headers '((content-type text/plain))))
+  (let-values (((r b)
                 (handler (build-request (string->uri "http://localhost/schingle/static.scm")) #f)))
     (and (check-response r #:code 200 #:headers '((content-type text/plain)))
-         (equal? b (read-file "static.scm")))))
+         (equal? b (read-file "static.scm"))))
+  (let-values (((r b)
+                (handler (build-request (string->uri "http://localhost/schingle/test/load.scm")) #f)))
+    (and (check-response r #:code 200 #:headers '((content-type text/plain)))
+         (equal? b (read-file "test/load.scm")))))
