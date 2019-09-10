@@ -1,6 +1,9 @@
 (use-modules (guest test)
              (schingle handler)
-             (srfi srfi-11))
+             (srfi srfi-11)
+             (web request)
+             (web response)
+             (web uri))
 
 (define-syntax-rule
   (values-equal? valuesa valuesb)
@@ -34,3 +37,25 @@
         #:headers '((content-type . (text/plain))))
       "500 Internal Server Error")
     ((500handler) #f #f)))
+
+(define (test-handler handler)
+  (routes->handler
+    (lambda (arg)
+      handler)))
+
+(define-test (schingle handler routes->handler)
+  (values-equal?
+    ((test-handler #f)
+     (build-request (string->uri "http://localhost"))
+     #f)
+    ((404handler) #f #f))
+  (values-equal?
+    ((test-handler (cons '() (lambda (p r b) (car '()))))
+     (build-request (string->uri "http://localhost"))
+     #f)
+    ((500handler) #f #f))
+  (values-equal?
+    ((test-handler (cons '() (lambda (p r b) (values 1 2))))
+     (build-request (string->uri "http://localhost"))
+     #f)
+    (values 1 2)))
