@@ -1,5 +1,6 @@
 (define-module (schingle handler)
   #:use-module (schingle route)
+  #:use-module (schingle content-type)
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)
@@ -13,29 +14,17 @@
 (define 400handler
   (make-parameter
     (lambda (request body)
-      (values
-        (build-response
-          #:code 400
-          #:headers '((content-type . (text/plain))))
-        "400 Bad Request"))))
+      (plain "400 Bad Request" #:code 400))))
 
 (define 404handler
   (make-parameter
     (lambda (request body)
-      (values
-        (build-response
-          #:code 404
-          #:headers '((content-type . (text/plain))))
-        "404 Not Found"))))
+      (plain "404 Not Found" #:code 404))))
 
 (define 500handler
   (make-parameter
     (lambda (request body)
-      (values
-        (build-response
-          #:code 500
-          #:headers '((content-type . (text/plain))))
-        "500 Internal Server Error"))))
+      (plain "500 Internal Server Error" #:code 500))))
 
 (define (routes->handler routefn)
   "produces a handler compatible with run-server from a compiled route table\
