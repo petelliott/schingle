@@ -1,6 +1,7 @@
 (define-module (schingle route)
   #:use-module (web uri)
   #:use-module (schingle util)
+  #:use-module (ice-9 regex)
   #:export (parse-route
             compile-routes
             parse-params
@@ -87,19 +88,59 @@
 (define* (make-pathmap path item #:optional (onto (make-hash-table)))
   (if (null? path)
     (hash-set! onto 'terminal item)
-    (make-pathmap (cdr path) item
-                  (or (hash-ref onto (pm-key (car path)))
-                      (hash-set! onto (pm-key (car path))
-                                 (make-hash-table)))))
+    (make-pathmap (cdr path) item (insert-or-get (car path) onto)))
   onto)
 
 (define* (pathmap-ref table path #:optional dflt)
   (cond
     ((equal? table #f) dflt)
     ((null? path) (hash-ref table 'terminal dflt))
-    (#t (pathmap-ref (or (hash-ref table (car path))
-                         (hash-ref table 'default))
-                     (cdr path) dflt))))
+    (#t (or (pathmap-ref (or (hash-ref table (car path))
+                             (hash-ref table 'default))
+                         (cdr path) dflt)
+            (splat-multi (hash-ref table 'splat) path dflt)))))
+
+(define (splat-multi alist path dflt)
+  (if (or (null? alist) (not alist))
+    dflt
+    (or (pathmap-splat (cdar alist) (caar alist) path dflt)
+        (splat-multi (cdr alist) path dflt))))
+
+(define (pathmap-splat table splat path dflt)
+  (pathmap-splat-reg table (splat-regex splat) path dflt))
+
+(define* (pathmap-splat-reg table splat-reg path #:optional dflt (splat-data '()))
+  (if (null? path)
+    dflt
+    (or (and (regexp-exec splat-reg (string-join splat-data "/"))
+             (pathmap-ref table path dflt))
+        (pathmap-splat-reg table splat-reg (cdr path) dflt
+                       (append splat-data (list (car path)))))))
+
+(define (splat-regex splat)
+  "returns a regex for a splat"
+  (make-regexp
+    (string-append
+      "^"
+      (string-join
+        (map (lambda (elem)
+               (if (equal? elem '*)
+                 "(.*)"
+                 elem))
+             splat)
+        "")
+      "$")))
+
+(define (insert-or-get key onto)
+  (if (list? key)
+    (or (assoc-ref (hash-ref onto 'splat) key)
+        (let ((table (make-hash-table)))
+          (hash-set! onto 'splat
+                     (acons key table (hash-ref onto 'splat '())))
+          table))
+    (or (hash-ref onto (pm-key key))
+        (hash-set! onto (pm-key key)
+                   (make-hash-table)))))
 
 (define (pm-key elem)
   (if (symbol? elem)

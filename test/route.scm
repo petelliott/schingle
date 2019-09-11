@@ -13,6 +13,10 @@
 
 (define-test (schingle route pathmap-splat)
   (equal? (pathmap-ref (make-pathmap '("a" (*) "b") 5) '("a" "b")) 5)
+  (equal? (pathmap-ref (make-pathmap '("a" ("y" * ".c") "b") 5) '("a" "yx.c" "b")) 5)
   (equal? (pathmap-ref (make-pathmap '("a" (*) "b") 5) '("a" "c" "b")) 5)
   (equal? (pathmap-ref (make-pathmap '("a" (*) "b") 5) '("a" "c" "d" "b")) 5)
-  (equal? (pathmap-ref (make-pathmap '("a" (*) "b") 5) '("a" "c" "d" "b")) 5))
+  (equal? (pathmap-ref (make-pathmap '("a" (*) "b") 5) '("a" "c" "d" "b")) 5)
+  (equal? (pathmap-ref (make-pathmap '("a" (*) "c" (*) "e") 5) '("a" "b" "c" "d" "e")) 5)
+  (equal? (pathmap-ref (make-pathmap '("a" (*) "c" (*) "e") 5) '("a" "c" "c" "c" "e")) 5)
+  (equal? (pathmap-ref (make-pathmap '("a" (*) "c" (*) "e") 5) '("a" "c" "c" "c" "c" "e")) 5))
