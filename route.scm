@@ -51,13 +51,48 @@
   (parse-inner-params (cdr (parse-route routespec))
                       (cdr (parse-mpath mpath))))
 
+(define (ev obj)
+  (write obj)
+  (newline)
+  obj)
+
 (define (parse-inner-params route path)
   (cond
-    ((null? path) '())
+    ((null? path) (and (null? route) '()))
+    ((null? route) (and (null? path) '()))
     ((symbol? (car route))
      (acons (car route) (car path)
        (parse-inner-params (cdr route) (cdr path))))
+    ((and (string? (car route))
+          (not (equal? (car route) (car path))))
+     #f)
+    ((list? (car route))
+       (parse-splat-param (splat-regex (car route))
+                          (cdr route) path))
     (#t (parse-inner-params (cdr route) (cdr path)))))
+
+(define (splat-acons vals alist)
+  (if (assoc-ref alist '*)
+    (map
+      (lambda (elem)
+        (if (equal? (car elem) '*)
+          (cons '* (append vals (cdr elem)))
+          elem))
+      alist)
+    (acons '* vals alist)))
+
+(define* (parse-splat-param splat-reg route-rest path #:optional (splat-data '()))
+  (let ((match (regexp-exec splat-reg (string-join splat-data "/")))
+        (rest  (parse-inner-params route-rest path)))
+    (if (and match rest)
+      (splat-acons
+        (map
+          (lambda (i)
+            (match:substring match i))
+          (cdr (iota (match:count match))))
+        rest)
+      (parse-splat-param splat-reg route-rest (cdr path) (append splat-data
+                                                                 (list (car path)))))))
 
 (define* (compile-routemap routelist #:optional dflt (onto (make-hash-table)))
   "compiles an alist keyed by routes int a function that takes a method/path pair\

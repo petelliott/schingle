@@ -12,9 +12,18 @@
 (define-test (schingle route parse-params-splat)
   (equal? (parse-params '(GET "a" (*) "c") '(GET "a" "b" "c")) '((* . ("b"))))
   (equal? (parse-params '(GET "a" (*) "c") '(GET "a" "b" "e" "c")) '((* . ("b/e"))))
-  (equal? (parse-params '(GET "a" (*.x) "c") '(GET "a" "b.x" "c")) '((* . ("b"))))
+  (equal? (parse-params '(GET "a" (* ".x") "c") '(GET "a" "b.x" "c")) '((* . ("b"))))
+  (equal? (parse-params '(GET "a" (*) "b" (*) "d") '(GET "a" "c" "c" "b" "c" "d"))
+          '((* . ("c/c" "c"))))
   (equal? (parse-params '(GET "c" (*) "c" (*) "c") '(GET "c" "c" "c" "c" "c" "c"))
-          '((* . ("c" "c/c")))))
+          '((* . ("" "c/c/c")))))
+
+(define splat-acons (@@ (schingle route) splat-acons))
+
+(define-test (schingle route splat-acons)
+  (equal? (splat-acons '() '()) '((*)))
+  (equal? (splat-acons '("a") '((a . b) (b . c))) '((* "a") (a . b) (b . c)))
+  (equal? (splat-acons '(x) '((a . b) (* . (c)) (b . c))) '((a . b) (* . (x c)) (b . c))))
 
 (define make-pathmap (@@ (schingle route) make-pathmap))
 (define pathmap-ref (@@ (schingle route) pathmap-ref))
