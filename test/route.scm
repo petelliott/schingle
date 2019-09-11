@@ -1,6 +1,21 @@
 (use-modules (guest test)
              (schingle route))
 
+(define parse-params (@@ (schingle route) parse-params))
+
+(define-test (schingle route parse-params)
+  (equal? (parse-params '(GET "a" "b" "c") '(GET "a" "b" "c")) '())
+  (equal? (parse-params '(GET "a" :b "c") '(GET "a" "b" "c")) '((:b . "b")))
+  (equal? (parse-params '(GET :a :b :c) '(GET "a" "b" "c"))
+          '((:a . "a") (:b . "b") (:c . "c"))))
+
+(define-test (schingle route parse-params-splat)
+  (equal? (parse-params '(GET "a" (*) "c") '(GET "a" "b" "c")) '((* . ("b"))))
+  (equal? (parse-params '(GET "a" (*) "c") '(GET "a" "b" "e" "c")) '((* . ("b/e"))))
+  (equal? (parse-params '(GET "a" (*.x) "c") '(GET "a" "b.x" "c")) '((* . ("b"))))
+  (equal? (parse-params '(GET "c" (*) "c" (*) "c") '(GET "c" "c" "c" "c" "c" "c"))
+          '((* . ("c" "c/c")))))
+
 (define make-pathmap (@@ (schingle route) make-pathmap))
 (define pathmap-ref (@@ (schingle route) pathmap-ref))
 
