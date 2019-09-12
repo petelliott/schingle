@@ -87,9 +87,9 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 ; static files
 
-(GET /schingle/:file
-     (lambda* (request body #:key :file)
-       (static 'text/plain :file)))
+(GET /schingle/*.scm
+     (lambda* (request body #:optional :file)
+       (static 'text/plain (string-append :file ".scm"))))
 
 )
 
