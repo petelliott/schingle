@@ -58,3 +58,53 @@ equivalent of `(run-server (make-handler routes) impl open-params)`
 ### (define-handlers name body* ...)
 
 syntax that expands to `(define name (list body* ...))`
+
+## (schingle content-type)
+
+### (handle-content proc)
+
+higher order function that produces a new handler that calls `transform-body` on the
+body before passing it to `proc`.
+
+### (transform-body request body)
+
+based on the `content-type` of the request, convert the request body to a
+scheme object.
+
+supported content types:
+
+- `text/plain`
+- `application/json`
+- `application/xml application/html`
+- `application/x.s-expression`
+- `application/x-www-form-urlencoded`
+
+any unrecognized content-types will return the body as it's original bytevector
+
+### returners
+
+handlers return the normal `(values response body)` that guile web handlers return.
+this can be very clunky for standard formats. schingle provides utility
+functions for this that transform the body from scheme obeject to body, and set
+the content-type.
+
+returners:
+
+- `plain`
+- `json`
+- `xml`
+- `html`
+- `sexp`
+- `urlencoded`
+
+example:
+
+```scheme
+(GET /json/:value
+     (lambda* (request body #:key :value)
+       (json `((value . ,:value)))))
+```
+
+
+returners takes the same optional arguments as
+[build-response](https://www.gnu.org/software/guile/manual/html_node/Responses.html#index-build_002dresponse).
