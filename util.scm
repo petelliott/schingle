@@ -4,7 +4,8 @@
             intersperse
             enlist
             to-string
-            alist->args))
+            alist->args
+            assoc-del))
 
 (define (multi-map lst . procs)
   "maps lst through procs, starting with the first function as the innermost"
@@ -41,3 +42,10 @@
       (cons
         (cdar alist)
         (alist->args (cdr alist))))))
+
+(define (assoc-del alist key)
+  "deletes all items associated with key from alist"
+  (filter
+    (lambda (pair)
+      (not (equal? (car pair) key)))
+    alist))
