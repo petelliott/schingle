@@ -105,6 +105,5 @@ example:
        (json `((value . ,:value)))))
 ```
 
-
 returners takes the same optional arguments as
 [build-response](https://www.gnu.org/software/guile/manual/html_node/Responses.html#index-build_002dresponse).
