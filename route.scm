@@ -51,11 +51,6 @@
   (parse-inner-params (cdr (parse-route routespec))
                       (cdr (parse-mpath mpath))))
 
-(define (ev obj)
-  (write obj)
-  (newline)
-  obj)
-
 (define (parse-inner-params route path)
   (cond
     ((null? path) (and (null? route) '()))
@@ -145,10 +140,10 @@
   (pathmap-splat-reg table (splat-regex splat) path dflt))
 
 (define* (pathmap-splat-reg table splat-reg path #:optional dflt (splat-data '()))
-  (if (null? path)
-    dflt
-    (or (and (regexp-exec splat-reg (string-join splat-data "/"))
-             (pathmap-ref table path dflt))
+  (or (and (regexp-exec splat-reg (string-join splat-data "/"))
+           (pathmap-ref table path dflt))
+      (if (null? path)
+        dflt
         (pathmap-splat-reg table splat-reg (cdr path) dflt
                        (append splat-data (list (car path)))))))
 
