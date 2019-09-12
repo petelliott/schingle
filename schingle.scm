@@ -18,8 +18,12 @@
     (cons
       (cons method route)
       (lambda (params request body)
-        (apply nproc request body
-               (alist->args params))))))
+        (let ((optional (or (assoc-ref params '*) '()))
+              (keyword  (assoc-del params '*)))
+          (apply nproc request body
+                 (append
+                   optional
+                   (alist->args keyword))))))))
 
 (define (GETs route proc)
   (schingle-route 'GET route proc))
