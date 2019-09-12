@@ -13,6 +13,8 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (plain (format #f "Hello, ~a!" :name))))
 ```
 
+[manual](https://github.com/Petelliott/schingle/blob/master/MANUAL.md)
+
 ## installation
 
 1) install [guile-json](https://github.com/aconchillo/guile-json)
