@@ -41,5 +41,4 @@
 
 (define (file-content-type file)
   "determines the content-type of a file from extension to mime type"
-  (hash-ref extension-table (regexp-exec ext-reg file)))
-
+  (hash-ref extension-table (match:substring (regexp-exec ext-reg file))))
