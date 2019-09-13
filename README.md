@@ -91,7 +91,7 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 (GET /schingle/*.scm
      (lambda* (request body #:optional :file)
-       (static 'text/plain (string-append :file ".scm"))))
+       (static (string-append :file ".scm") 'text/plain)))
 
 )
 
