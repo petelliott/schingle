@@ -2,8 +2,8 @@
   #:use-module (sxml simple)
   #:export (tag-ref
             tag-let
-            bind-tag
-            define-tag))
+            define-tag
+            apply-template))
 
 
 (define local-tags (make-parameter '()))
@@ -28,7 +28,49 @@
 (define-syntax define-tag
   (syntax-rules ()
     ((_ (name args* ...) body* ...)
-     (bind-tag 'name (lambda (args* ...)
+     (bind-tag 'name (lambda* (args* ...)
                        body* ...)))
     ((_ name val)
      (bind-tag 'name val))))
+
+(define (has-attribs elem)
+  (and (not (null? (cdr elem)))
+       (pair? (cadr elem))
+       (eq? '@ (caadr elem))))
+
+(define (attribs->args attribs)
+  (cond
+   ((not attribs) '())
+   ((null? attribs) '())
+   (else
+    (cons (caar attribs)
+          (cons (cadar attribs)
+                (attribs->args (cdr attribs)))))))
+
+(define (node-attribs node)
+  (and (has-attribs node)
+       (cadr node)))
+
+(define (node-body node)
+  (if (has-attribs node)
+      (cddr node)
+      (cdr node)))
+
+(define (make-node tag attribs body)
+  (if attribs
+      (cons tag (cons attribs body))
+      (cons tag body)))
+
+(define (apply-template template)
+  (cond
+   ((not (pair? template)) template)
+   ((tag-ref (car template))
+    (let ((val (tag-ref (car template))))
+      (if (procedure? val)
+          (apply (tag-ref (car template))
+                 (map apply-template (node-body template))
+                 (attribs->args (node-attribs template)))
+          val)))
+   (else (make-node (car template)
+                    (node-attribs template)
+                    (map apply-template (node-body template))))))
