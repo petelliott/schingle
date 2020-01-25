@@ -32,6 +32,7 @@
     (equal? (tag-ref 'a) 6))
   (equal? (tag-ref 'a) 5))
 
+
 (define-tag tag1 52)
 (define-test (schingle template apply-template-val)
   (equal? (apply-template (xml->sxml "<tag1/>")) '(*TOP* 52))
@@ -42,7 +43,9 @@
           '(*TOP* (p 52)))
   (tag-let ((tag1 53))
     (equal? (apply-template (xml->sxml "<p><tag1 a='b'/></p>"))
-            '(*TOP* (p 53)))))
+            '(*TOP* (p 53))))
+  (equal? (apply-template (xml->sxml "<div a='b'/>"))
+          '(*TOP* (div (@ (a "b"))))))
 
 (define-tag (tag2 body . rest) (list body rest))
 (define-test (schingle template apply-template-fn)
