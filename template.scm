@@ -23,7 +23,8 @@
              (cdr rest))))
 
 (define-syntax-rule (tag-let ((key val) ...) body* ...)
-  (parameterize ((tags (pcons (tags) (cons 'key val) ...))) body* ...))
+  (parameterize ((local-tags (pcons (local-tags) (cons 'key val) ...)))
+                 body* ...))
 
 (define-syntax define-tag
   (syntax-rules ()
