@@ -7,4 +7,5 @@
              (schingle schingle)
              ;(schingle sinatra)
              (schingle static)
-             (schingle util))
+             (schingle util)
+             (schingle template))

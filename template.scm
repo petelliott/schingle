@@ -31,6 +31,9 @@
     ((_ (name args* ...) body* ...)
      (bind-tag 'name (lambda* (args* ...)
                        body* ...)))
+    ((_ (name args* ... . rest) body* ...)
+     (bind-tag 'name (lambda* (args* ... . rest)
+                       body* ...)))
     ((_ name val)
      (bind-tag 'name val))))
 
@@ -43,8 +46,10 @@
   (cond
    ((not attribs) '())
    ((null? attribs) '())
+   ((eq? (car attribs) '@)
+    (attribs->args (cdr attribs)))
    (else
-    (cons (caar attribs)
+    (cons (symbol->keyword (caar attribs))
           (cons (cadar attribs)
                 (attribs->args (cdr attribs)))))))
 
