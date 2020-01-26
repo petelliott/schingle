@@ -55,3 +55,8 @@
           '(*TOP* (p (() (#:c "d" #:a "b")))))
   (equal? (apply-template (xml->sxml "<p><tag2>hello</tag2></p>"))
           '(*TOP* (p (("hello") ())))))
+
+(define-tag z 5000)
+(define-test (schingle template apply-template-file)
+  (equal? (apply-template-file "test/test.schtml")
+          '(*TOP* (html "\n" (body "\n\n" (p 5000) "\n\n") "\n"))))

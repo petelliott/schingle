@@ -3,7 +3,8 @@
   #:export (tag-ref
             tag-let
             define-tag
-            apply-template))
+            apply-template
+            apply-template-file))
 
 
 (define local-tags (make-parameter '()))
@@ -80,3 +81,9 @@
    (else (make-node (car template)
                     (node-attribs template)
                     (map apply-template (node-body template))))))
+
+;; TODO: cache files
+(define (apply-template-file fname)
+  (call-with-input-file fname
+    (lambda (port)
+      (apply-template (xml->sxml port)))))
