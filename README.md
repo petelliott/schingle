@@ -35,7 +35,8 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
              (schingle static)
              (schingle handler)
              (schingle query)
-             (schingle template))
+             (schingle template)
+             (schingle middleware))
 
 ; paths in schingle may be strings or symbols:
 (GET "/hello"
@@ -105,5 +106,5 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
   (plain "oopsiedoo" #:code 404))
 
 (parameterize ((404handler custom404))
-  (run-schingle))
+  (run-schingle #:middleware (list (make-cors-middleware))))
 ```

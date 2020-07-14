@@ -4,6 +4,7 @@
   #:use-module (schingle route)
   #:use-module (schingle handler)
   #:use-module (schingle content-type)
+  #:use-module (schingle middleware)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GETs HEADs POSTs PUTs DELETEs TRACEs
@@ -98,7 +99,8 @@
 (define (schingle-handler)
   (routes->handler (routes)))
 
-(define* (run-schingle #:optional (impl 'http) (open-params '()))
+(define* (run-schingle #:key (impl 'http) (open-params '())
+                       (middleware '()))
   "convinience function that combines making the handler and starting the server."
-  (run-server (schingle-handler)
+  (run-server (apply-middleware (schingle-handler) middleware)
               impl open-params))
