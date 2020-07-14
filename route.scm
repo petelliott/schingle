@@ -5,7 +5,12 @@
   #:export (parse-route
             compile-routes
             parse-params
-            compile-routemap))
+            compile-routemap
+            make-routes
+            add-route
+            routes-ref))
+
+
 
 (define (parse-route routespec)
   "parse a routespec, returning a list that represents it.\
@@ -98,6 +103,21 @@
             routelist)
   (lambda (mpath)
     (routemap-ref onto (parse-mpath mpath) dflt)))
+
+(define (make-routes)
+  (make-hash-table))
+
+(define (add-route routes route)
+  (let ((mpath (parse-route (car route))))
+    (make-routemap mpath (cons mpath (cdr route)) routes)))
+
+(define* (routes-ref routes mpath #:optional dflt)
+  (let ((ret (routemap-ref routes (parse-mpath mpath) dflt)))
+    (if ret
+        (cons
+         (parse-params (car ret) mpath)
+         (cdr ret))
+        dflt)))
 
 (define (parse-mpath mpath)
   (if (string? (cdr mpath))
