@@ -37,7 +37,8 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
              (schingle query)
              (schingle template))
 
-(GET /hello
+; paths in schingle may be strings or symbols:
+(GET "/hello"
      (lambda (request body)
        (plain "Hello World")))
 
