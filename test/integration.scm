@@ -12,7 +12,7 @@
              (ice-9 binary-ports))
 
 (define (make-handlers)
-  (make-handler (list
+  (parameterize ((routes (make-routes)))
     (GET /hello
          (lambda (request body)
            (plain "Hello World")))
@@ -66,7 +66,9 @@
 
     (GET /schingle/*.scm
          (lambda* (request body #:optional :file)
-           (static (string-append :file ".scm") 'text/plain))))))
+           (static (string-append :file ".scm") 'text/plain)))
+
+    (schingle-handler)))
 
 (define-test (schingle integration sanity)
   (make-handlers))

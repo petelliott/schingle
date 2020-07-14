@@ -1,5 +1,6 @@
 (use-modules (guest test)
              (schingle handler)
+             (schingle route)
              (srfi srfi-11)
              (web request)
              (web response)
@@ -38,24 +39,12 @@
             "500 Internal Server Error")
            ((500handler) #f #f))))
 
-(define (test-handler handler)
-  (routes->handler
-    (lambda (arg)
-      handler)))
+(define (test-handler)
+  (routes->handler (make-routes)))
 
 (define-test (schingle handler routes->handler)
   (assert (values-equal?
-           ((test-handler #f)
+           ((test-handler)
             (build-request (string->uri "http://localhost"))
             #f)
-           ((404handler) #f #f)))
-  (assert (values-equal?
-           ((test-handler (cons '() (lambda (p r b) (car '()))))
-            (build-request (string->uri "http://localhost"))
-            #f)
-           ((500handler) #f #f)))
-  (assert (values-equal?
-           ((test-handler (cons '() (lambda (p r b) (values 1 2))))
-            (build-request (string->uri "http://localhost"))
-            #f)
-           (values 1 2))))
+           ((404handler) #f #f))))

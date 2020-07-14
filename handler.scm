@@ -26,12 +26,12 @@
     (lambda (request body)
       (plain "500 Internal Server Error" #:code 500))))
 
-(define (routes->handler routefn)
-  "produces a handler compatible with run-server from a compiled route table\
+(define (routes->handler routes)
+  "produces a handler compatible with run-server from a route table\
   with (params reqeust body) args"
   (lambda (request body)
-    (let ((handler (routefn (cons (request-method request)
-                                  (uri-path (request-uri request))))))
+    (let ((handler (routes-ref routes (cons (request-method request)
+                                            (uri-path (request-uri request))))))
       (catch #t
         (lambda ()
           (if handler

@@ -3,9 +3,11 @@
   #:use-module (schingle util)
   #:use-module (ice-9 regex)
   #:export (parse-route
-            compile-routes
             parse-params
-            compile-routemap))
+            make-routes
+            add-route
+            routes-ref))
+
 
 (define (parse-route routespec)
   "parse a routespec, returning a list that represents it.\
@@ -34,17 +36,6 @@
                (string-contains elem "*"))
         (delete "" (intersperse '* (string-split elem #\*)))
         elem))))
-
-(define* (compile-routes routelist #:optional dflt (onto (make-hash-table)))
-  "like compile-routemap, but returns an alist of args and value pair"
-  (let ((rm (compile-routemap routelist #f onto)))
-    (lambda (mpath)
-      (let ((ret (rm mpath)))
-        (if ret
-          (cons
-            (parse-params (car ret) mpath)
-            (cdr ret))
-          dflt)))))
 
 (define (parse-params routespec mpath)
   "produces an alist of args from the path and the spec"
@@ -89,15 +80,20 @@
       (parse-splat-param splat-reg route-rest (cdr path) (append splat-data
                                                                  (list (car path)))))))
 
-(define* (compile-routemap routelist #:optional dflt (onto (make-hash-table)))
-  "compiles an alist keyed by routes int a function that takes a method/path pair\
-  and returns a routespec/value pair. has optional default argument"
-  (for-each (lambda (routeval)
-              (let ((mpath (parse-route (car routeval))))
-                (make-routemap mpath (cons mpath (cdr routeval)) onto)))
-            routelist)
-  (lambda (mpath)
-    (routemap-ref onto (parse-mpath mpath) dflt)))
+(define (make-routes)
+  (make-hash-table))
+
+(define (add-route routes route)
+  (let ((mpath (parse-route (car route))))
+    (make-routemap mpath (cons mpath (cdr route)) routes)))
+
+(define* (routes-ref routes mpath #:optional dflt)
+  (let ((ret (routemap-ref routes (parse-mpath mpath) dflt)))
+    (if ret
+        (cons
+         (parse-params (car ret) mpath)
+         (cdr ret))
+        dflt)))
 
 (define (parse-mpath mpath)
   (if (string? (cdr mpath))
