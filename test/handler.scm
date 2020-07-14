@@ -1,5 +1,6 @@
 (use-modules (guest test)
              (schingle handler)
+             (schingle route)
              (srfi srfi-11)
              (web request)
              (web response)
