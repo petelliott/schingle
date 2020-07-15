@@ -100,7 +100,9 @@
   (routes->handler (routes)))
 
 (define* (run-schingle #:key (impl 'http) (open-params '())
-                       (middleware '()))
+                       (middleware '())
+                       (h404 (404handler)) (h500 (500handler)) (h400 (400handler)))
   "convinience function that combines making the handler and starting the server."
-  (run-server (apply-middleware (schingle-handler) middleware)
-              impl open-params))
+  (parameterize ((404handler h404) (500handler h500) (400handler h400))
+    (run-server (apply-middleware (schingle-handler) middleware)
+                impl open-params)))

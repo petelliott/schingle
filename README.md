@@ -105,6 +105,6 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
   "a custom 404 handler. custom 500 and 400 handlers can also be defined"
   (plain "oopsiedoo" #:code 404))
 
-(parameterize ((404handler custom404))
-  (run-schingle #:middleware (list (make-cors-middleware))))
+(run-schingle #:middleware (list (make-cors-middleware))
+              #:h404 custom404)
 ```
