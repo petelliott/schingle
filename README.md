@@ -106,5 +106,6 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
   (plain "oopsiedoo" #:code 404))
 
 (run-schingle #:middleware (list (make-cors-middleware))
+              #:port 8080 ; optional setting of port
               #:h404 custom404)
 ```
