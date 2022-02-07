@@ -101,7 +101,8 @@
 
 (define* (run-schingle #:key (impl 'http)
                        (port 8080)
-                       (open-params `(#:port ,port))
+                       (addr INADDR_ANY)
+                       (open-params `(#:port ,port #:addr ,addr))
                        (middleware '())
                        (h404 (404handler)) (h500 (500handler)) (h400 (400handler)))
   "convinience function that combines making the handler and starting the server."
