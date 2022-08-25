@@ -33,7 +33,6 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 (use-modules (schingle schingle)
              (schingle content-type)
              (schingle static)
-             (schingle handler)
              (schingle query)
              (schingle template)
              (schingle middleware))
