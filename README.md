@@ -6,23 +6,15 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 ```scheme
 (GET /hello/:name
-     (lambda* (request body #:key :name)
+     (lambda (request body :name)
        (plain (format #f "Hello, ~a!" :name))))
 ```
-
-[manual](https://github.com/Petelliott/schingle/blob/master/MANUAL.md)
 
 ## installation
 
 1) install [guile-json](https://github.com/aconchillo/guile-json)
 
 2) clone this repository into somewhere on guile's `%load-path`
-
-## testing
-
-1) install [guest](https://github.com/Petelliott/guest)
-
-2) run `guest test/`
 
 ## a more fleshed out example
 
