@@ -23,7 +23,6 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
              (schingle content-type)
              (schingle static)
              (schingle query)
-             (schingle template)
              (schingle middleware))
 
 ; paths in schingle may be strings or symbols:
@@ -81,13 +80,6 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 (GET "/schingle/(.*.scm)"
      (lambda* (request body filename)
        (static filename 'text/plain)))
-
-; templates
-
-(GET /template
-     (lambda (request body)
-       (tag-let ((z "dynamic content"))
-         (html (apply-template-file "test/test.schtml")))))
 
 (define (custom404 request body)
   "a custom 404 handler. custom 500 and 400 handlers can also be defined"
