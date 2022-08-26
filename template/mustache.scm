@@ -27,10 +27,13 @@
             (pre    (substring text i (match:start nexttag))))
         (cond
          ((or (equal? marker "#") (equal? marker "^"))
-          (let-values (((child end) (parse text nexti key)))
-            (mcons pre
-                   (make-tag key #f (equal? marker "^") child)
-                   (parse text end close-tag))))
+          (let*-values (((child end) (parse text nexti key))
+                        ((rest end2) (parse text end close-tag)))
+            (values
+             (mcons pre
+                    (make-tag key #f (equal? marker "^") child)
+                    rest)
+             end2)))
          ((equal? marker "/")
           (unless (equal? key close-tag)
             (error "mustache: unexpected closing tag" key))
