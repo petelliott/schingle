@@ -16,7 +16,7 @@
             run-schingle
             schingle-handler
             router)
-  #:re-export (plain json xml html sexp urlencoded
+  #:re-export (plain json xml html sexp urlencoded redirect
                template static req-query query
                schingle-static-folder
                schingle-template-folder))

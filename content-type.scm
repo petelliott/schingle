@@ -1,5 +1,6 @@
 (define-module (schingle content-type)
   #:use-module (web request)
+  #:use-module (web http)
   #:use-module (web response)
   #:use-module (web uri)
   #:use-module (ice-9 iconv)
@@ -15,7 +16,8 @@
             xml
             html
             sexp
-            urlencoded))
+            urlencoded
+            redirect))
 
 (define (handle-content proc)
   "produces a new handler that transforms the body based on the content-type"
@@ -116,3 +118,9 @@
   (values
     (apply build-content-response '(application/x-www-form-urlencoded) rest)
     (alist->query body)))
+
+(define (redirect code path . rest)
+  "redirects to a different endpoint"
+  (values
+   (apply build-content-response '(text/plain) #:code code #:headers `((location . ,(parse-header 'location path))) rest)
+   "redirecting..."))
