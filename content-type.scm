@@ -9,6 +9,7 @@
   #:use-module (schingle handler)
   #:export (handle-content
             transform-body
+            build-content-response
             plain
             json
             xml

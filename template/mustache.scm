@@ -3,6 +3,7 @@
   #:use-module (srfi srfi-11)
   #:use-module (ice-9 regex)
   #:use-module (schingle util)
+  #:use-module (schingle template engines)
   #:export (mustache-compile
             mustache-render))
 
@@ -93,3 +94,5 @@
    ((string? (car template))
     (display (car template))
     (mustache-render (cdr template) data))))
+
+(register-template-engine "\\.mustache$" mustache-compile mustache-render)

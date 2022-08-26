@@ -1,24 +1,3 @@
-# schingle
-
-schingle (pronounced shingle) is a tiny web framework for guile inspired by
-[ningle](https://github.com/fukamachi/ningle) (hence "SCHeme nINGLE") and
-[sinatra](https://github.com/sinatra/sinatra). It is licensed under the LGPLv3.
-
-```scheme
-(GET /hello/:name
-     (lambda (request body :name)
-       (plain (format #f "Hello, ~a!" :name))))
-```
-
-## installation
-
-1) install [guile-json](https://github.com/aconchillo/guile-json)
-
-2) clone this repository into somewhere on guile's `%load-path`
-
-## a more fleshed out example
-
-```scheme
 (use-modules (schingle schingle)
              (schingle content-type)
              (schingle static)
@@ -98,4 +77,3 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
               #:port 8080 ; optional setting of port
               #:use-cache #t ; optional cache for static files and templates
               #:h404 custom404)
-```
