@@ -8,7 +8,7 @@
   #:export (400handler
             404handler
             500handler
-            routes->handler
+            router->handler
             safe-display-error))
 
 (define 400handler
@@ -26,16 +26,17 @@
     (lambda (request body)
       (plain "500 Internal Server Error" #:code 500))))
 
-(define (routes->handler routes)
+(define (router->handler router)
   "produces a handler compatible with run-server from a route table\
   with (params reqeust body) args"
   (lambda (request body)
-    (let ((handler (routes-ref routes (cons (request-method request)
-                                            (uri-path (request-uri request))))))
+    (let ((handler (match-route router
+                                (request-method request)
+                                (uri-path (request-uri request)))))
       (catch #t
         (lambda ()
           (if handler
-            ((cdr handler) (car handler) request body)
+            (apply (route-match-value handler) request body (route-match-captures handler))
             ((404handler) request body)))
         ; post-unwind handler
         (lambda (key . args)

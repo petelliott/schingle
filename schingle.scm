@@ -11,22 +11,9 @@
             OPTIONSs CONNECTs PATCHs
             run-schingle
             schingle-handler
-            routes))
+            router))
 
-(define routes (make-parameter (make-routes)))
-
-(define (schingle-route method route proc)
-  "create a route-entry like '((METHOD . /route) . #<proc>)"
-  (let ((nproc (handle-content proc)))
-    (cons
-      (cons method route)
-      (lambda (params request body)
-        (let ((optional (or (assoc-ref params '*) '()))
-              (keyword  (assoc-del params '*)))
-          (apply nproc request body
-                 (append
-                   optional
-                   (alist->args keyword))))))))
+(define router (make-parameter (make-router)))
 
 (define (maybe-symbol->string val)
   (if (string? val)
@@ -34,70 +21,70 @@
       (symbol->string val)))
 
 (define (GETs route proc)
-  (add-route (routes) (schingle-route 'GET route proc)))
+  (add-route! (router) 'GET route (handle-content proc)))
 
 (define-syntax-rule
   (GET route proc)
   (GETs (maybe-symbol->string (quote route)) proc))
 
 (define (HEADs route proc)
-  (add-route (routes) (schingle-route 'HEAD route proc)))
+  (add-route! (router) 'HEAD route (handle-content proc)))
 
 (define-syntax-rule
   (HEAD route proc)
   (HEADs (maybe-symbol->string (quote route)) proc))
 
 (define (POSTs route proc)
-  (add-route (routes) (schingle-route 'POST route proc)))
+  (add-route! (router) 'POST route (handle-content proc)))
 
 (define-syntax-rule
   (POST route proc)
   (POSTs (maybe-symbol->string (quote route)) proc))
 
 (define (PUTs route proc)
-  (add-route (routes) (schingle-route 'PUT route proc)))
+  (add-route! (router) 'PUT route (handle-content proc)))
 
 (define-syntax-rule
   (PUT route proc)
   (PUTs (maybe-symbol->string (quote route)) proc))
 
 (define (DELETEs route proc)
-  (add-route (routes) (schingle-route 'DELETE route proc)))
+  (add-route! (router) 'DELETE route (handle-content proc)))
 
 (define-syntax-rule
   (DELETE route proc)
   (DELETEs (maybe-symbol->string (quote route)) proc))
 
 (define (TRACEs route proc)
-  (add-route (routes) (schingle-route 'TRACE route proc)))
+  (add-route! (router) 'TRACE route (handle-content proc)))
 
 (define-syntax-rule
   (TRACE route proc)
   (TRACEs (maybe-symbol->string (quote route)) proc))
 
 (define (OPTIONSs route proc)
-  (add-route (routes) (schingle-route 'OPTIONS route proc)))
+  (add-route! (router) 'OPTIONS route (handle-content proc)))
 
 (define-syntax-rule
   (OPTIONS route proc)
   (OPTIONSs (maybe-symbol->string (quote route)) proc))
 
 (define (CONNECTs route proc)
-  (add-route (routes) (schingle-route 'CONNECT route proc)))
+  (add-route! (router) 'CONNECT route (handle-content proc)))
 
 (define-syntax-rule
   (CONNECT route proc)
   (CONNECTs (maybe-symbol->string (quote route)) proc))
 
 (define (PATCHs route proc)
-  (add-route (routes) (schingle-route 'PATCH route proc)))
+  (add-route! (router) 'PATCH route (handle-content proc)))
 
 (define-syntax-rule
   (PATCH route proc)
   (PATCHs (maybe-symbol->string (quote route)) proc))
 
 (define (schingle-handler)
-  (routes->handler (routes)))
+  (router->handler (router)))
 
 (define* (run-schingle #:key (impl 'http)
                        (port 8080)

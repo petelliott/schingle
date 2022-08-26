@@ -40,7 +40,7 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (plain "Hello World")))
 
 (GET /hello/:name
-     (lambda* (request body #:key :name)
+     (lambda (request body :name)
        (plain (format #f "Hello, ~a!" :name))))
 
 (GET /error
@@ -65,30 +65,30 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 ; simple return types
 
 (GET /json/:value
-     (lambda* (request body #:key :value)
+     (lambda (request body :value)
        (json `((value . ,:value)))))
 
 (GET /xml/:value
-     (lambda* (request body #:key :value)
+     (lambda (request body :value)
        (xml `(value ,:value))))
 
 (GET /html/:value
-     (lambda* (request body #:key :value)
+     (lambda (request body :value)
        (html `((html (p ,:value))))))
 
 (GET /sexp/:value
-     (lambda* (request body #:key :value)
+     (lambda (request body :value)
        (sexp `((value . ,:value)))))
 
 (GET /urlencoded/:value
-     (lambda* (request body #:key :value)
+     (lambda (request body :value)
        (urlencoded `((value . ,:value)))))
 
 ; static files
 
-(GET /schingle/*.scm
-     (lambda* (request body #:optional :file)
-       (static (string-append :file ".scm") 'text/plain)))
+(GET "/schingle/(.*.scm)"
+     (lambda* (request body filename)
+       (static filename 'text/plain)))
 
 ; templates
 
