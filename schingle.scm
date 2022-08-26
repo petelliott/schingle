@@ -6,13 +6,18 @@
   #:use-module (schingle content-type)
   #:use-module (schingle middleware)
   #:use-module (schingle cache)
+  #:use-module (schingle template)
+  #:use-module (schingle static)
+  #:use-module (schingle query)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GETs HEADs POSTs PUTs DELETEs TRACEs
             OPTIONSs CONNECTs PATCHs
             run-schingle
             schingle-handler
-            router))
+            router)
+  #:re-export (plain json xml html sexp urlencoded
+               template static req-query))
 
 (define router (make-parameter (make-router)))
 

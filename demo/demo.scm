@@ -1,8 +1,4 @@
 (use-modules (schingle schingle)
-             (schingle content-type)
-             (schingle static)
-             (schingle query)
-             (schingle template)
              (schingle middleware))
 
 ; paths in schingle may be strings or symbols:
