@@ -65,6 +65,8 @@
                                        (listitems ((text . "hello"))
                                                   ((text . "world")))))))
 
+(schingle-static-folder "../")
+
 (define (custom404 request body)
   "a custom 404 handler. custom 500 and 400 handlers can also be defined"
   (plain "oopsiedoo" #:code 404))

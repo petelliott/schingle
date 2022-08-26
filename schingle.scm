@@ -17,7 +17,9 @@
             schingle-handler
             router)
   #:re-export (plain json xml html sexp urlencoded
-               template static req-query))
+               template static req-query
+               schingle-static-folder
+               schingle-template-folder))
 
 (define router (make-parameter (make-router)))
 

@@ -5,9 +5,12 @@
   #:use-module (web response)
   #:use-module (schingle ftypes)
   #:use-module (schingle cache)
-  #:export (schingle-static-cache
+  #:export (schingle-static-folder
+            schingle-static-cache
             static
             file-content-type))
+
+(define schingle-static-folder (make-parameter ""))
 
 (define schingle-static-cache (make-parameter
                                 (make-hash-table)))
@@ -22,7 +25,7 @@
                              'system-error
                              (lambda ()
                                (transf
-                                (call-with-input-file file
+                                (call-with-input-file (string-append (schingle-static-folder) file)
                                   (lambda (port)
                                     (get-bytevector-all port)))))
                              (lambda (key . args)
