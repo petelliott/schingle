@@ -1,6 +1,7 @@
 (define-module (schingle handler)
   #:use-module (schingle route)
   #:use-module (schingle content-type)
+  #:use-module (schingle query)
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)
@@ -35,9 +36,10 @@
                                 (uri-path (request-uri request)))))
       (catch #t
         (lambda ()
-          (if handler
-            (apply (route-match-value handler) request body (route-match-captures handler))
-            ((404handler) request body)))
+          (parameterize ((*query-string* (req-query request)))
+            (if handler
+                (apply (route-match-value handler) request body (route-match-captures handler))
+                ((404handler) request body))))
         ; post-unwind handler
         (lambda (key . args)
           ((500handler) request body))

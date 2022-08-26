@@ -40,10 +40,9 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 (GET /form
      (lambda (request body)
-       (let ((query (req-query request)))
          (plain (format #f "Hello, ~a ~a!"
-                        (assoc-ref query "firstname")
-                        (assoc-ref query "lastname"))))))
+                        (query "firstname")
+                        (query "lastname")))))
 
 (POST /form
       (lambda (request body)
@@ -85,6 +84,8 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
        (template "template.mustache" `((name . ,:name)
                                        (listitems ((text . "hello"))
                                                   ((text . "world")))))))
+
+(schingle-static-folder "../")
 
 (define (custom404 request body)
   "a custom 404 handler. custom 500 and 400 handlers can also be defined"

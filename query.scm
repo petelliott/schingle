@@ -5,7 +5,9 @@
   #:use-module (schingle util)
   #:export (query->alist
             alist->query
-            req-query))
+            req-query
+            *query-string*
+            query))
 
 (define (empty-split str char)
   "like string-split, but empty strings and #f become '()"
@@ -36,3 +38,8 @@
 (define (req-query request)
   "returns the request's query string as an alist"
   (query->alist (uri-query (request-uri request))))
+
+(define *query-string* (make-parameter #f))
+
+(define (query key)
+  (assoc-ref (*query-string*) key))

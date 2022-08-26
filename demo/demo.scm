@@ -19,10 +19,9 @@
 
 (GET /form
      (lambda (request body)
-       (let ((query (req-query request)))
          (plain (format #f "Hello, ~a ~a!"
-                        (assoc-ref query "firstname")
-                        (assoc-ref query "lastname"))))))
+                        (query "firstname")
+                        (query "lastname")))))
 
 (POST /form
       (lambda (request body)
