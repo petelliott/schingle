@@ -4,6 +4,7 @@
   #:use-module (ice-9 regex)
   #:use-module (schingle util)
   #:use-module (schingle template engines)
+  #:use-module (schingle template)
   #:export (mustache-compile
             mustache-render))
 
@@ -43,7 +44,8 @@
           (let-values (((rest end) (parse text nexti close-tag)))
             (values (cons pre rest) end)))
          ((equal? marker ">")
-          (error "TODO: partial support"))
+          (let-values (((rest end) (parse text nexti close-tag)))
+            (values (cons pre (append (compile-template (string-append key ".mustache") mustache) rest)) end)))
          (else
           (let-values (((rest end) (parse text nexti close-tag)))
             (values (mcons pre
@@ -95,4 +97,4 @@
     (display (car template))
     (mustache-render (cdr template) data))))
 
-(register-template-engine "\\.mustache$" mustache-compile mustache-render)
+(define mustache (register-template-engine "\\.mustache$" mustache-compile mustache-render))

@@ -7,7 +7,6 @@
   #:use-module (schingle template mustache)
   #:use-module (schingle content-type)
   #:export (schingle-template-folder
-            register-template-engine
             compile-template
             render-template
             template))

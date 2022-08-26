@@ -17,6 +17,8 @@
 (define template-engines (make-parameter '()))
 
 (define (register-template-engine regex compile render)
+  (define engine (make-template-engine regex compile render))
   (template-engines
-   (cons (make-template-engine regex compile render)
-         template-engines)))
+   (cons engine
+         template-engines))
+  engine)
