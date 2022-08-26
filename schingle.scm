@@ -5,6 +5,7 @@
   #:use-module (schingle handler)
   #:use-module (schingle content-type)
   #:use-module (schingle middleware)
+  #:use-module (schingle cache)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GETs HEADs POSTs PUTs DELETEs TRACEs
@@ -91,8 +92,10 @@
                        (addr INADDR_ANY)
                        (open-params `(#:port ,port #:addr ,addr))
                        (middleware '())
+                       (use-cache #f)
                        (h404 (404handler)) (h500 (500handler)) (h400 (400handler)))
   "convinience function that combines making the handler and starting the server."
-  (parameterize ((404handler h404) (500handler h500) (400handler h400))
+  (parameterize ((404handler h404) (500handler h500) (400handler h400)
+                 (schingle-cache-enable use-cache))
     (run-server (apply-middleware (schingle-handler) middleware)
                 impl open-params)))

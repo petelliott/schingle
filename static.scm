@@ -4,6 +4,7 @@
   #:use-module (ice-9 regex)
   #:use-module (web response)
   #:use-module (schingle ftypes)
+  #:use-module (schingle cache)
   #:export (schingle-static-cache
             static
             file-content-type))
@@ -15,27 +16,24 @@
                  #:key (transf identity) (cache (schingle-static-cache)))
   "load and serve a static file from the cache with content-type content-type.\
   if content-type is not provided, it will be determined from the file extention"
-  (let ((data
-          (or
-            (hash-ref cache (cons file transf))
-            (catch
-              'system-error
-              (lambda ()
-                (hash-set! cache (cons file transf)
-                           (transf
-                             (call-with-input-file
-                             file
-                             (lambda (port)
-                               (get-bytevector-all port))))))
-              (lambda (key . args)
-                #f)))))
+    (define data (cached 'static (cons file transf)
+                         (lambda ()
+                           (catch
+                             'system-error
+                             (lambda ()
+                               (transf
+                                (call-with-input-file file
+                                  (lambda (port)
+                                    (get-bytevector-all port)))))
+                             (lambda (key . args)
+                               #f)))))
     (if data
-      (values
-        (build-response
+        (values
+         (build-response
           #:code 200
           #:headers `((content-type . (,content-type))))
-        data)
-      ((404handler) #f #f))))
+         data)
+        ((404handler) #f #f)))
 
 (define ext-reg (make-regexp "\\.[^\\.]*$"))
 
