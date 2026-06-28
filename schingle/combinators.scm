@@ -1,19 +1,16 @@
-(define-module (schingle middleware)
+(define-module (schingle combinators)
   #:use-module (srfi srfi-11)
   #:use-module (web request)
   #:use-module (web server)
   #:use-module (web response)
-  #:export (apply-middleware
+  #:export (apply-combinators
             add-headers
             make-cors-middleware))
 
-(define (apply-middleware handler middleware)
-  "create a new guile http handler by calling each proc in the list middleware \
-   on it"
-  (if (null? middleware)
-      handler
-      (apply-middleware ((car middleware) handler)
-                        (cdr middleware))))
+(define (apply-combinators combinators)
+  (if (null? combinators)
+      #f
+      ((car combinators) (apply-combinators (cdr combinators)))))
 
 (define (add-headers request response body . headers)
   (define sr (sanitize-response request response body))

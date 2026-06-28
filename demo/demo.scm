@@ -1,52 +1,51 @@
 (use-modules (schingle)
-             (schingle middleware))
+             (schingle combinators))
 
-; paths in schingle may be strings or symbols:
 (GET "/hello"
      (lambda (request body)
        (plain "Hello World")))
 
-(GET /hello/:name
+(GET "/hello/:name"
      (lambda (request body :name)
        (plain (format #f "Hello, ~a!" :name))))
 
-(GET /error
+(GET "/error"
      (lambda (request body)
        (car '()) ; cause an error to invoke 500 handler
        (plain "this shouldn't happen")))
 
 ; html form support
 
-(GET /form
+(GET "/form"
      (lambda (request body)
          (plain (format #f "Hello, ~a ~a!"
                         (query "firstname")
                         (query "lastname")))))
 
-(POST /form
+(POST "/form"
       (lambda (request body)
         (plain (format #f "Hello, ~a ~a!"
                        (assoc-ref body "firstname")
                        (assoc-ref body "lastname")))))
 ; simple return types
 
-(GET /json/:value
+(GET "/json/:value"
      (lambda (request body :value)
        (json `((value . ,:value)))))
 
-(GET /xml/:value
+(GET "/xml/:value"
      (lambda (request body :value)
        (xml `(value ,:value))))
 
-(GET /html/:value
+(GET "/html/:value"
      (lambda (request body :value)
        (html `((html (p ,:value))))))
 
-(GET /sexp/:value
+(GET "/sexp/:value"
      (lambda (request body :value)
        (sexp `((value . ,:value)))))
 
-(GET /urlencoded/:value
+(GET "/urlencoded/:value"
      (lambda (request body :value)
        (urlencoded `((value . ,:value)))))
 
@@ -58,7 +57,7 @@
 
 ; templates
 
-(GET /template/:name
+(GET "/template/:name"
      (lambda (request body :name)
        (template "template.mustache" `((name . ,:name)
                                        (listitems ((text . "hello"))
@@ -66,11 +65,7 @@
 
 (schingle-static-folder "../")
 
-(define (custom404 request body)
-  "a custom 404 handler. custom 500 and 400 handlers can also be defined"
-  (plain "oopsiedoo" #:code 404))
 
-(run-schingle #:middleware (list (make-cors-middleware))
-              #:port 8080 ; optional setting of port
-              #:use-cache #t ; optional cache for static files and templates
-              #:h404 custom404)
+(run-schingle
+ #:port 8080 ; optional setting of port
+ )

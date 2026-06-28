@@ -4,105 +4,66 @@
   #:use-module (schingle route)
   #:use-module (schingle handler)
   #:use-module (schingle content-type)
-  #:use-module (schingle middleware)
+  #:use-module (schingle combinators)
   #:use-module (schingle cache)
   #:use-module (schingle template)
   #:use-module (schingle static)
   #:use-module (schingle query)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
-            GETs HEADs POSTs PUTs DELETEs TRACEs
-            OPTIONSs CONNECTs PATCHs
             run-schingle
             schingle-handler
-            router)
+            *schingle-routes*
+            route)
   #:re-export (plain json xml html sexp urlencoded redirect
                template static req-query query
                schingle-static-folder
                schingle-template-folder))
 
-(define router (make-parameter (make-router)))
+(define *schingle-routes* (make-parameter '()))
 
-(define (maybe-symbol->string val)
-  (if (string? val)
-      val
-      (symbol->string val)))
+(define (route methods path proc)
+  (*schingle-routes* (add-route (*schingle-routes*) methods path proc)))
 
-(define (GETs route proc)
-  (add-route! (router) 'GET route (handle-content proc)))
+(define-syntax make-method-route
+  (syntax-rules ()
+    ((_ sym)
+     (define (sym path proc)
+       (route '(sym) path proc)))))
 
-(define-syntax-rule
-  (GET route proc)
-  (GETs (maybe-symbol->string (quote route)) proc))
+(make-method-route GET)
+(make-method-route HEAD)
+(make-method-route POST)
+(make-method-route PUT)
+(make-method-route DELETE)
+(make-method-route TRACE)
+(make-method-route OPTIONS)
+(make-method-route CONNECT)
+(make-method-route PATCH)
 
-(define (HEADs route proc)
-  (add-route! (router) 'HEAD route (handle-content proc)))
+(define *schingle-lowerware* (make-parameter '()))
+(define *schingle-middleware* (make-parameter '()))
+(define *schingle-upperware* (make-parameter '()))
 
-(define-syntax-rule
-  (HEAD route proc)
-  (HEADs (maybe-symbol->string (quote route)) proc))
+(define (use-lowerware . combinators)
+  (*schingle-lowerware* (append (reverse combinators) (*schingle-lowerware*))))
 
-(define (POSTs route proc)
-  (add-route! (router) 'POST route (handle-content proc)))
+(define (use-middleware . combinators)
+  (*schingle-middleware* (append (reverse combinators) (*schingle-middleware*))))
 
-(define-syntax-rule
-  (POST route proc)
-  (POSTs (maybe-symbol->string (quote route)) proc))
+(define (use-upperware . combinators)
+  (*schingle-upperware* (append (reverse combinators) (*schingle-upperware*))))
 
-(define (PUTs route proc)
-  (add-route! (router) 'PUT route (handle-content proc)))
+(use-lowerware
+ (routes->combinator *schingle-routes*))
 
-(define-syntax-rule
-  (PUT route proc)
-  (PUTs (maybe-symbol->string (quote route)) proc))
-
-(define (DELETEs route proc)
-  (add-route! (router) 'DELETE route (handle-content proc)))
-
-(define-syntax-rule
-  (DELETE route proc)
-  (DELETEs (maybe-symbol->string (quote route)) proc))
-
-(define (TRACEs route proc)
-  (add-route! (router) 'TRACE route (handle-content proc)))
-
-(define-syntax-rule
-  (TRACE route proc)
-  (TRACEs (maybe-symbol->string (quote route)) proc))
-
-(define (OPTIONSs route proc)
-  (add-route! (router) 'OPTIONS route (handle-content proc)))
-
-(define-syntax-rule
-  (OPTIONS route proc)
-  (OPTIONSs (maybe-symbol->string (quote route)) proc))
-
-(define (CONNECTs route proc)
-  (add-route! (router) 'CONNECT route (handle-content proc)))
-
-(define-syntax-rule
-  (CONNECT route proc)
-  (CONNECTs (maybe-symbol->string (quote route)) proc))
-
-(define (PATCHs route proc)
-  (add-route! (router) 'PATCH route (handle-content proc)))
-
-(define-syntax-rule
-  (PATCH route proc)
-  (PATCHs (maybe-symbol->string (quote route)) proc))
-
-(define (schingle-handler)
-  (router->handler (router)))
 
 (define* (run-schingle #:key (impl 'http)
                        (port 8080)
                        (addr INADDR_ANY)
-                       (open-params `(#:port ,port #:addr ,addr))
-                       (middleware '())
-                       (use-cache #f)
-                       (h404 (404handler)) (h500 (500handler)) (h400 (400handler)))
+                       (open-params `(#:port ,port #:addr ,addr)))
   "convinience function that combines making the handler and starting the server."
-  (parameterize ((404handler h404) (500handler h500) (400handler h400)
-                 (schingle-cache-enable use-cache))
-    (run-server (apply-middleware (schingle-handler) middleware)
-                impl open-params)))
+  (run-server (apply-combinators (append (*schingle-upperware*)
+                                         (*schingle-middleware*)
+                                         (*schingle-lowerware*)))
+              impl open-params))
