@@ -14,12 +14,12 @@ schingle (pronounced shingle) is a tiny web framework for guile inspired by
 
 1) install [guile-json](https://github.com/aconchillo/guile-json)
 
-2) clone this repository and put /src somewhere on guile's `%load-path`
+2) clone this repository and add it to guile's `%load-path`
 
 ## a more fleshed out example
 
 ```scheme
-(use-modules (schingle schingle)
+(use-modules (schingle)
              (schingle middleware))
 
 ; paths in schingle may be strings or symbols:

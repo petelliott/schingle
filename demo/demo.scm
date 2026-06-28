@@ -1,4 +1,4 @@
-(use-modules (schingle schingle)
+(use-modules (schingle)
              (schingle middleware))
 
 ; paths in schingle may be strings or symbols:

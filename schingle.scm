@@ -1,4 +1,4 @@
-(define-module (schingle schingle)
+(define-module (schingle)
   #:use-module (schingle util)
   #:use-module (web server)
   #:use-module (schingle route)
