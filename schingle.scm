@@ -5,7 +5,6 @@
   #:use-module (schingle handler)
   #:use-module (schingle content-type)
   #:use-module (schingle combinators)
-  #:use-module (schingle cache)
   #:use-module (schingle template)
   #:use-module (schingle static)
   #:use-module (schingle query)

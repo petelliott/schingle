@@ -4,32 +4,25 @@
   #:use-module (ice-9 regex)
   #:use-module (web response)
   #:use-module (schingle ftypes)
-  #:use-module (schingle cache)
   #:export (schingle-static-folder
-            schingle-static-cache
             static
             file-content-type))
 
 (define schingle-static-folder (make-parameter ""))
 
-(define schingle-static-cache (make-parameter
-                                (make-hash-table)))
-
 (define* (static file #:optional (content-type (file-content-type file))
-                 #:key (transf identity) (cache (schingle-static-cache)))
+                 #:key (transf identity))
   "load and serve a static file from the cache with content-type content-type.\
   if content-type is not provided, it will be determined from the file extention"
-    (define data (cached 'static (cons file transf)
-                         (lambda ()
-                           (catch
-                             'system-error
-                             (lambda ()
-                               (transf
-                                (call-with-input-file (string-append (schingle-static-folder) file)
-                                  (lambda (port)
-                                    (get-bytevector-all port)))))
-                             (lambda (key . args)
-                               #f)))))
+  (define data (catch
+                 'system-error
+                 (lambda ()
+                   (transf
+                    (call-with-input-file (string-append (schingle-static-folder) file)
+                      (lambda (port)
+                        (get-bytevector-all port)))))
+                 (lambda (key . args)
+                   #f)))
     (if data
         (values
          (build-response
