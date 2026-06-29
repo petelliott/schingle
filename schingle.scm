@@ -7,6 +7,7 @@
   #:use-module (schingle combinators)
   #:use-module (schingle template)
   #:use-module (schingle static)
+  #:use-module (schingle status)
   #:use-module (schingle query)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
@@ -54,6 +55,7 @@
   (*schingle-upperware* (append (reverse combinators) (*schingle-upperware*))))
 
 (use-lowerware
+ (lambda (next) (lambda (request body) (not-found)))
  (routes->combinator *schingle-routes*))
 
 
