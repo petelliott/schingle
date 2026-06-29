@@ -1,6 +1,5 @@
 (define-module (schingle template)
   #:use-module (srfi srfi-1)
-  #:use-module (schingle cache)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 textual-ports)
   #:use-module (schingle template engines)
@@ -23,19 +22,17 @@
        (get-string-all port)))))
 
 (define (render-template filename data)
-  (define compiled
-    (cached 'template filename
-            (lambda ()
-              (define engine (or (find (lambda (engine)
-                                         (string-match (te-regex engine) filename))
-                                       (template-engines))
-                                 (error "could not find template engine for file" filename)))
-              (define compiled (compile-template filename engine))
-              (lambda (data)
-                (call-with-output-string
-                 (lambda (port)
-                   (parameterize ((current-output-port port))
-                     ((te-render engine) compiled data))))))))
+  (define compiled (lambda ()
+                     (define engine (or (find (lambda (engine)
+                                                (string-match (te-regex engine) filename))
+                                              (template-engines))
+                                        (error "could not find template engine for file" filename)))
+                     (define compiled (compile-template filename engine))
+                     (lambda (data)
+                       (call-with-output-string
+                         (lambda (port)
+                           (parameterize ((current-output-port port))
+                             ((te-render engine) compiled data)))))))
   (compiled data))
 
 (define (template filename data . rest)

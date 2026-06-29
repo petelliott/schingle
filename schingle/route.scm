@@ -2,6 +2,7 @@
   #:use-module (web uri)
   #:use-module (web request)
   #:use-module (schingle util)
+  #:use-module (schingle status)
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-9)
   #:export (add-route
@@ -36,13 +37,18 @@
               (inner (+ n 1)))))
   (inner 1))
 
-(define (match-route routes path)
+(define (match-route routes method path mna)
   (if (null? routes)
-      #f
-      (let ((hit (regexp-exec (route-regex (car routes)) path)))
-        (if hit
-            (make-route-match (car routes) (match-captures hit) (route-value (car routes)))
-            (match-route (cdr routes) path)))))
+      mna
+      (let ((path-match (regexp-exec (route-regex (car routes)) path))
+            (method-match (member method (route-methods (car routes)))))
+        (cond
+         ((and path-match method-match)
+          (make-route-match (car routes) (match-captures path-match) (route-value (car routes))))
+         (path-match
+          (match-route (cdr routes) method path 'method-not-allowed))
+         (else
+          (match-route (cdr routes) method path mna))))))
 
 (define (path->route method path value)
   (define parts (split-and-decode-uri-path path))
@@ -61,10 +67,10 @@
 (define (routes->combinator routes-fn)
   (lambda (next)
     (lambda (request body)
-      (let ((route (match-route (routes-fn) (uri-path (request-uri request)))))
+      (let ((route (match-route (routes-fn) (request-method request) (uri-path (request-uri request)) #f)))
         (cond
          ((not route) (next request body))
-         ((not (member (request-method request) (route-methods (route-match-route route))))
-          (error "TODO: 405"))
+         ((eq? route 'method-not-allowed)
+          (method-not-allowed))
          (else
           (apply (route-match-value route) request body (route-match-captures route))))))))
