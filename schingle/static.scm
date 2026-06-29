@@ -1,9 +1,9 @@
 (define-module (schingle static)
-  #:use-module (schingle handler)
   #:use-module (ice-9 binary-ports)
   #:use-module (ice-9 regex)
   #:use-module (web response)
   #:use-module (schingle ftypes)
+  #:use-module (schingle status)
   #:export (schingle-static-folder
             static
             file-content-type))
@@ -22,6 +22,9 @@
                       (lambda (port)
                         (get-bytevector-all port)))))
                  (lambda (key . args)
+                   (write key)
+                   (write args)
+                   (newline)
                    #f)))
     (if data
         (values
@@ -29,7 +32,7 @@
           #:code 200
           #:headers `((content-type . (,content-type))))
          data)
-        ((404handler) #f #f)))
+        (not-found)))
 
 (define ext-reg (make-regexp "\\.[^\\.]*$"))
 

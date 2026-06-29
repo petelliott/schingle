@@ -7,7 +7,7 @@
   #:use-module (json)
   #:use-module (sxml simple)
   #:use-module (schingle query)
-  #:use-module (schingle handler)
+  #:use-module (schingle status)
   #:export (handle-content
             transform-body
             build-content-response
@@ -32,8 +32,8 @@
                       (safe-display-error key args)
                       failure))))
       (if (not (equal? nbody failure))
-        (apply proc request (transform-body request body) rest)
-        ((400handler) request body)))))
+          (apply proc request (transform-body request body) rest)
+          (bad-request)))))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \

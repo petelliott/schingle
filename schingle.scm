@@ -2,13 +2,13 @@
   #:use-module (schingle util)
   #:use-module (web server)
   #:use-module (schingle route)
-  #:use-module (schingle handler)
   #:use-module (schingle content-type)
   #:use-module (schingle combinators)
   #:use-module (schingle template)
   #:use-module (schingle static)
   #:use-module (schingle status)
   #:use-module (schingle query)
+  #:use-module (schingle error)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             run-schingle
@@ -58,6 +58,8 @@
  (lambda (next) (lambda (request body) (not-found)))
  (routes->combinator *schingle-routes*))
 
+(use-upperware
+ 500combinator)
 
 (define* (run-schingle #:key (impl 'http)
                        (port 8080)

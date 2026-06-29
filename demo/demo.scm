@@ -64,7 +64,7 @@
                                        (listitems ((text . "hello"))
                                                   ((text . "world")))))))
 
-(schingle-static-folder "../")
+(schingle-static-folder "./")
 
 
 (run-schingle
