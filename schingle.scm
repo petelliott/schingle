@@ -16,7 +16,7 @@
             route
             use-middleware)
   #:re-export (plain json xml html sexp urlencoded redirect
-               template static req-query query
+               template static request-query query
                schingle-static-folder
                schingle-template-folder))
 
@@ -59,6 +59,7 @@
  (routes->combinator *schingle-routes*))
 
 (use-upperware
+ query-string-combinator
  500combinator)
 
 (define* (run-schingle #:key (impl 'http)

@@ -3,11 +3,13 @@
   #:use-module (web uri)
   #:use-module (web request)
   #:use-module (schingle util)
+  #:use-module (schingle combinators)
   #:export (query->alist
             alist->query
-            req-query
+            request-query
             *query-string*
-            query))
+            query
+            query-string-combinator))
 
 (define (empty-split str char)
   "like string-split, but empty strings and #f become '()"
@@ -35,11 +37,19 @@
          alist)
     "&"))
 
-(define (req-query request)
+(define (request-query request)
   "returns the request's query string as an alist"
   (query->alist (uri-query (request-uri request))))
 
 (define *query-string* (make-parameter #f))
 
+(define (query-string-combinator next)
+  (lambda (request body)
+    ;; we don't  want to parse the query string unless we use it. if so, only parse once
+    (parameterize ((*query-string* request))
+      (next request body))))
+
 (define (query key)
+  (if (request? (*query-string*))
+      (*query-string* (request-query (*query-string*))))
   (assoc-ref (*query-string*) key))
