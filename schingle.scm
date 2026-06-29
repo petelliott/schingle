@@ -12,9 +12,9 @@
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             run-schingle
-            schingle-handler
             *schingle-routes*
-            route)
+            route
+            use-middleware)
   #:re-export (plain json xml html sexp urlencoded redirect
                template static req-query query
                schingle-static-folder

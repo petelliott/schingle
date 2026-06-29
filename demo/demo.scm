@@ -1,5 +1,5 @@
 (use-modules (schingle)
-             (schingle combinators))
+             (schingle contrib cors))
 
 (GET "/hello"
      (lambda (request body)
@@ -65,6 +65,11 @@
                                                   ((text . "world")))))))
 
 (schingle-static-folder "./")
+
+;; middleware
+
+(use-middleware
+ (make-cors-middleware))
 
 
 (run-schingle
