@@ -3,9 +3,10 @@
 
 (GET "/hello"
      (lambda (request body)
-       (plain "Hello World")))
+       (plain "Hello World\n")))
 
-(GET-static "/hello-static" (plain "Hello World, statically"))
+(GET-static "/hello-static"
+            (plain "Hello World, statically\n"))
 
 (GET "/hello/:name"
      (lambda (request body :name)

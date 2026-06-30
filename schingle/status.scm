@@ -23,7 +23,7 @@
     ((_ name parameter default-msg code)
      (begin
        (define parameter (make-parameter (lambda (msg)
-                                           (plain (or msg default-msg) #:code code))))
+                                           (plain (string-append (or msg default-msg) "\n") #:code code))))
        (define* (name #:optional (msg #f))
          ((parameter) msg))))))
 
