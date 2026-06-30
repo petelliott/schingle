@@ -19,7 +19,6 @@
 
 ; html form support
 
-
 (GET "/form"
      (lambda (request body)
          (plain (format #f "Hello, ~a ~a!"
@@ -55,19 +54,20 @@
 
 ; static files
 
+(schingle-include-path "../schingle")
+
 (GET "/schingle/(.*.scm)"
      (lambda (request body filename)
        (static filename 'text/plain)))
 
 ; templates
 
-(GET "/template/:name"
+
+#;(GET "/template/:name"
      (lambda (request body :name)
        (template "template.mustache" `((name . ,:name)
                                        (listitems ((text . "hello"))
                                                   ((text . "world")))))))
-
-(schingle-static-folder "./")
 
 ;; middleware
 

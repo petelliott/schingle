@@ -5,11 +5,11 @@
   #:use-module (schingle route)
   #:use-module (schingle content-type)
   #:use-module (schingle combinators)
-  #:use-module (schingle template)
   #:use-module (schingle static)
   #:use-module (schingle status)
   #:use-module (schingle query)
   #:use-module (schingle error)
+  #:use-module (schingle load)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static
@@ -19,9 +19,8 @@
             route
             use-middleware)
   #:re-export (plain json xml html sexp urlencoded redirect
-               template static request-query query
-               schingle-static-folder
-               schingle-template-folder))
+               static request-query query
+               schingle-include-path))
 
 (define *schingle-routes* (make-parameter '()))
 
