@@ -5,6 +5,8 @@
      (lambda (request body)
        (plain "Hello World")))
 
+(GET-static "/hello-static" (plain "Hello World, statically"))
+
 (GET "/hello/:name"
      (lambda (request body :name)
        (plain (format #f "Hello, ~a!" :name))))
