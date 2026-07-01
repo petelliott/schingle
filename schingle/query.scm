@@ -2,7 +2,6 @@
   #:use-module (srfi srfi-1)
   #:use-module (web uri)
   #:use-module (web request)
-  #:use-module (schingle util)
   #:use-module (schingle combinators)
   #:export (query->alist
             alist->query
@@ -31,9 +30,9 @@
   (string-join
     (map (lambda (pair)
            (string-append
-             (uri-encode (to-string (car pair)))
+             (uri-encode (object->string (car pair) display))
              "="
-             (uri-encode (to-string (cdr pair)))))
+             (uri-encode (object->string (cdr pair) display))))
          alist)
     "&"))
 
