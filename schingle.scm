@@ -19,7 +19,8 @@
             route
             use-middleware)
   #:re-export (plain json xml html sexp urlencoded redirect content
-               static request-query query
+               static serve-directory
+               request-query query
                schingle-include-path))
 
 (define *schingle-routes* (make-parameter '()))
@@ -70,6 +71,7 @@
 
 (use-lowerware
  (lambda (next) (lambda (request body) (not-found)))
+ serve-directory-combinator
  (routes->combinator *schingle-routes*))
 
 (use-upperware

@@ -61,6 +61,9 @@
      (lambda (request body filename)
        (static filename 'text/plain)))
 
+(serve-directory "../schingle" "/static" `((".scm" . ,(lambda (file)
+                                                        (plain file)))))
+
 ; templates
 
 ; templates are rendered from schingle's include path

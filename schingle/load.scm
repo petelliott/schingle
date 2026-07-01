@@ -35,12 +35,10 @@
   (define true-path (schingle-resolve-path  path))
   (and true-path
        (call-with-input-file true-path
-         (lambda (port)
-           (get-bytevector-all port)))))
+         get-bytevector-all)))
 
 (define (schingle-read-file path)
   (define true-path (schingle-resolve-path  path))
   (and true-path
        (call-with-input-file true-path
-         (lambda (port)
-           (get-string-all port)))))
+         get-string-all)))

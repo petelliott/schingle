@@ -1,7 +1,8 @@
 (define-module (schingle ftypes)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 regex)
-  #:export (extension->content-type
+  #:export (file-extension
+            extension->content-type
             content-type->extension))
 
 ; extracted from:
@@ -106,9 +107,11 @@
 
 (define ext-reg (make-regexp "\\.[^\\.]*$"))
 
+(define (file-extension filename)
+ (match:substring (regexp-exec ext-reg filename)))
+
 (define (extension->content-type filename-or-extension)
-  (hash-ref extension-type-table
-            (match:substring (regexp-exec ext-reg filename-or-extension))))
+  (hash-ref extension-type-table (file-extension filename-or-extension)))
 
 (define (content-type->extension content-type)
   (hash-ref type-extension-table content-type))
