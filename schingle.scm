@@ -73,6 +73,7 @@
  (routes->combinator *schingle-routes*))
 
 (use-upperware
+ transform-body-combinator
  query-string-combinator
  500combinator)
 

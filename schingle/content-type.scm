@@ -10,6 +10,7 @@
   #:use-module (schingle status)
   #:export (handle-content
             transform-body
+            transform-body-combinator
             build-content-response
             plain
             json
@@ -19,6 +20,10 @@
             urlencoded
             redirect
             content))
+
+(define (transform-body-combinator next)
+  (lambda (request body)
+    (next request (transform-body request body))))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \
