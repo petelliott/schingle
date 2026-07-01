@@ -17,23 +17,8 @@
             html
             sexp
             urlencoded
-            redirect))
-
-(define (handle-content proc)
-  "produces a new handler that transforms the body based on the content-type"
-  (lambda (request body . rest)
-    (let* ((failure (gensym))
-           (nbody (catch #t
-                    (lambda ()
-                      (transform-body request body))
-                    (lambda (key . args)
-                      (format #t "malformed body in request to ~A: "
-                              (uri-path (request-uri request)))
-                      (safe-display-error key args)
-                      failure))))
-      (if (not (equal? nbody failure))
-          (apply proc request (transform-body request body) rest)
-          (bad-request)))))
+            redirect
+            content))
 
 (define (transform-body request body)
   "transforms body into a suitable scheme object based on request's \
@@ -124,3 +109,8 @@
   (values
    (apply build-content-response '(text/plain) #:code code #:headers `((location . ,(parse-header 'location path))) rest)
    "redirecting..."))
+
+(define (content type body . rest)
+  (values
+   (apply build-content-response type rest)
+   body))

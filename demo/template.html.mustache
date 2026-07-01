@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>hello, {{name}}</h2>
+    <ul>
+      <li>{{var}}</li>
+      <li>{{lambdavar}}</li>
+      {{#varsection}}
+      <li>{{str}}</li>
+      {{/varsection}}
+      {{#varsection}}
+      {{#str}}
+      <li>nested variable sections</li>
+      {{/str}}
+      {{/varsection}}
+      {{#listsection}}
+      <li>{{text}}</li>
+      {{/listsection}}
+      <li>
+        {{#lambdasection}}
+        lambda
+        {{/lambdasection}}
+      </li>
+      {{#falsesection}}
+      <li>it is an error to see this list item </li>
+      {{/falsesection}}
+      {{^falsesection}}
+      <li>inverted sections</li>
+      {{/falsesection}}
+      {{! it is an error to see this comment }}
+      {{> partial}}
+      {{<parent}}
+          it is an error to see the content of a parent
+          {{$item}}
+          blocks and parents
+          {{/item}}
+      {{/parent}}
+    </ul>
+  </body>
+</html>

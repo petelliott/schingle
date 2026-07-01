@@ -1,5 +1,6 @@
 (use-modules (schingle)
-             (schingle contrib cors))
+             (schingle contrib cors)
+             (schingle template mustache))
 
 (GET "/hello"
      (lambda (request body)
@@ -62,12 +63,23 @@
 
 ; templates
 
+; templates are rendered from schingle's include path
+(schingle-include-path "./")
 
-#;(GET "/template/:name"
+(define template (mustache-compile "template.html.mustache"))
+
+(GET "/template/:name"
      (lambda (request body :name)
-       (template "template.mustache" `((name . ,:name)
-                                       (listitems ((text . "hello"))
-                                                  ((text . "world")))))))
+       (content '(text/html)
+                (template `((name . ,:name)
+                            (var . "variables")
+                            (lambdavar . ,(lambda () "lambda variables"))
+                            (varsection . ((str . "variable sections")))
+                            (listsection . #(((text . "list sections 1/2"))
+                                             ((text . "list sections 2/2"))))
+                            (lambdasection . ,(lambda (text) (string-append text "sections")))
+                            (falsesection . #f)
+                            )))))
 
 ;; middleware
 
@@ -76,5 +88,4 @@
 
 
 (run-schingle
- #:port 8080 ; optional setting of port
- )
+ #:port 8080) ; optional setting of port

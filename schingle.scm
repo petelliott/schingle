@@ -18,7 +18,7 @@
             *schingle-static-routes*
             route
             use-middleware)
-  #:re-export (plain json xml html sexp urlencoded redirect
+  #:re-export (plain json xml html sexp urlencoded redirect content
                static request-query query
                schingle-include-path))
 
