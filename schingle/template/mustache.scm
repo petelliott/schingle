@@ -26,7 +26,8 @@
 (define text-i (make-parameter #f))
 
 (define (tag-noescape? match)
-  (equal? (match:substring match 1) "{"))
+  (or (equal? (match:substring match 1) "{")
+      (equal? (tag-type match) "&")))
 
 (define (tag-type match)
   (match:substring match 2))
@@ -60,12 +61,15 @@
       (lambda (data blocks)
         (string-append pre (t data blocks) (post data blocks)))))))
 
-(define (render-datum datum)
-  ;; TODO: escape html
+(define (render-datum datum escape)
+  (define (convert thing)
+    (if escape
+        (xml-escape (object->string thing display))
+        (object->string thing display)))
   (cond
    ((not datum) "")
-   ((procedure? datum) (datum))
-   (else (object->string datum display))))
+   ((procedure? datum) (convert (datum)))
+   (else (convert datum))))
 
 (define set-block (make-parameter #f))
 
@@ -74,10 +78,9 @@
   (define key (tag-key nexttag))
   (cond
    ;; variables
-   ((equal? type "")
+   ((or (equal? type "") (equal? type "&"))
     (lambda (data blocks)
-      ;; TODO: escape html entities
-      (render-datum (tag-assoc data key))))
+      (render-datum (tag-assoc data key) (not (tag-noescape? nexttag)))))
    ;; sections
    ((equal? type "#")
     (let ((body (parse-body key)))

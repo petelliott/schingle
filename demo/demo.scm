@@ -73,6 +73,7 @@
        (content '(text/html)
                 (template `((name . ,:name)
                             (var . "variables")
+                            (html . "<b>escaped html</b>")
                             (lambdavar . ,(lambda () "lambda variables"))
                             (varsection . ((str . "variable sections")))
                             (listsection . #(((text . "list sections 1/2"))
