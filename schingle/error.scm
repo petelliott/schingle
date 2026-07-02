@@ -16,6 +16,7 @@
         (internal-server-error))
       ;; pre-unwind handler
       (lambda (key . args)
+        (backtrace)
         (format #t "error in request to ~A: " (uri-path (request-uri request)))
         (safe-display-error key args)))))
 
