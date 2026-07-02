@@ -2,6 +2,7 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 regex)
   #:export (file-extension
+            full-file-extension
             extension->content-type
             content-type->extension))
 
@@ -105,10 +106,21 @@
 (define type-extension-table
   (alist->hash-table (reverse-alist extension-alist)))
 
-(define ext-reg (make-regexp "\\.[^\\.]*$"))
+(define last-ext-reg (make-regexp "\\.[^/\\.]*$"))
 
 (define (file-extension filename)
- (match:substring (regexp-exec ext-reg filename)))
+  (define match (regexp-exec last-ext-reg filename))
+  (if match
+      (match:substring match)
+      ""))
+
+(define full-ext-reg (make-regexp "\\.[^/]*$"))
+
+(define (full-file-extension filename)
+  (define match (regexp-exec full-ext-reg filename))
+  (if match
+      (match:substring match)
+      ""))
 
 (define (extension->content-type filename-or-extension)
   (hash-ref extension-type-table (file-extension filename-or-extension)))
