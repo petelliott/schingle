@@ -6,6 +6,7 @@
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-9)
   #:export (add-route
+            path->route
             match-route
             route-match-route
             route-match-captures

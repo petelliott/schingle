@@ -5,7 +5,8 @@
   #:use-module (schingle util)
   #:use-module (schingle load)
   #:export (mustache-compile
-            mustache-compile-string))
+            mustache-compile-string
+            mustache-renderer))
 
 (define tagre
   (make-regexp "\\{\\{(\\{?) *([&#^/>$<]?) *([a-zA-Z0-9]+) *\\}\\}\\}?"))
@@ -149,3 +150,7 @@
 (define (mustache-compile filename)
   (define compiled (mustache-compile-blocks filename))
   (lambda (data) (compiled data '())))
+
+(define (mustache-renderer data)
+  (lambda (content)
+    ((mustache-compile-string content) data)))

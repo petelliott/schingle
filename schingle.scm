@@ -5,21 +5,20 @@
   #:use-module (schingle route)
   #:use-module (schingle content-type)
   #:use-module (schingle combinators)
-  #:use-module (schingle static)
   #:use-module (schingle status)
   #:use-module (schingle query)
   #:use-module (schingle error)
   #:use-module (schingle load)
+  #:use-module (schingle render)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static
             run-schingle
             *schingle-routes*
-            *schingle-static-routes*
             route
             use-middleware)
   #:re-export (plain json xml html sexp urlencoded redirect content
-               static serve-directory
+               serve-directory add-renderer render
                request-query query
                schingle-include-path))
 
@@ -45,7 +44,7 @@
 (make-method-route CONNECT)
 (make-method-route PATCH)
 
-(define *schingle-static-routes* (make-parameter '()))
+(define *schingle-serve-static* (make-parameter #t))
 
 (define-syntax GET-static
   (syntax-rules ()

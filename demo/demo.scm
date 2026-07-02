@@ -53,16 +53,17 @@
      (lambda (request body :value)
        (urlencoded `((value . ,:value)))))
 
-; static files
+; rendered files
 
 (schingle-include-path "../schingle")
 
 (GET "/schingle/(.*.scm)"
      (lambda (request body filename)
-       (static filename 'text/plain)))
+       (render filename)))
 
-(serve-directory "../schingle" "/static" `((".scm" . ,(lambda (file)
-                                                        (plain file)))))
+(add-renderer ".mustache" (mustache-renderer '((name . "peter"))))
+
+(serve-directory "./static" "/")
 
 ; templates
 
