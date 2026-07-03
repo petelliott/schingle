@@ -25,7 +25,9 @@
 (define (get-backing-file file)
   (cond
    ((file-exists? file) file)
-   ((find (lambda (f) (string-prefix? (basename file) f)) (scandir (dirname file))) =>
+   ((find (lambda (f) (string-prefix? (basename file) f))
+          (or (scandir (dirname file))
+              '())) =>
     (lambda (f)
       (in-vicinity (dirname file) f)))
    (else #f)))
