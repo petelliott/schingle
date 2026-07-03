@@ -12,6 +12,7 @@
   #:use-module (schingle render)
   #:use-module (schingle build)
   #:use-module (schingle context)
+  #:use-module (schingle logging)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static
@@ -22,7 +23,8 @@
   #:re-export (plain json xml html sexp urlencoded redirect content
                serve-directory add-renderer render
                request-query query
-               schingle-include-path))
+               schingle-include-path
+               schingle-logging))
 
 (define *schingle-routes* (make-schingle-parameter '()))
 
@@ -78,7 +80,8 @@
 (use-upperware
  transform-body-combinator
  query-string-combinator
- 500combinator)
+ 500combinator
+ logging-combinator)
 
 (define* (run-schingle #:key (impl 'http)
                        (port 8000)
@@ -88,4 +91,5 @@
   (run-server (apply-combinators (append (*schingle-upperware*)
                                          (*schingle-middleware*)
                                          (*schingle-lowerware*)))
-              impl open-params))
+              impl open-params)
+  (newline))
