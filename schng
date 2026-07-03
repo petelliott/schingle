@@ -5,6 +5,7 @@
 
 (use-modules (ice-9 getopt-long)
              (ice-9 ftw)
+             (ice-9 threads)
              (schingle)
              (schingle build)
              (schingle render)
@@ -47,9 +48,28 @@
      (run-schingle #:port port
                    #:addr address))))
 
-(define (watch site address port)
-  (display "watch is not yet implemented\n")
-  (exit 1))
+;; guile's run-server doesn't play nice with (cancel-thread)
+(define (jank-subprocess thunk)
+  (define pid (primitive-fork))
+  (if (= pid 0)
+      (begin
+        (thunk)
+        (exit 0))
+      pid))
+
+
+
+(define (watch site port address watch-dirs)
+  (define pid (jank-subprocess
+               (lambda () (run site port address))))
+  (define ret (system (format #f "inotifywait -r -e modify,create,delete,move~{ ~a~}" watch-dirs)))
+  ;; this seems pretty jank
+  (kill pid SIGKILL)
+  (waitpid pid)
+  (if (= ret 0)
+      (begin
+        (watch site port address watch-dirs))
+      (newline)))
 
 
 ;; parse options and run.
@@ -123,8 +143,11 @@
        (string->number (option-ref options 'port "8000"))
        (option-ref options 'address INADDR_ANY)))
  ((equal? command "watch")
-  (run dir
+  (watch dir
        (string->number (option-ref options 'port "8000"))
-       (option-ref options 'address INADDR_ANY)))
+       (option-ref options 'address INADDR_ANY)
+       (append (list dir)
+               (option-ref-all options 'include)
+               (option-ref-all options 'load))))
  (else
   (usage)))

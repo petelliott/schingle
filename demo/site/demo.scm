@@ -7,7 +7,7 @@
        (plain "Hello World\n")))
 
 (GET-static "/hello-static"
-            (plain "Hello World, statically\n"))
+            (plain "Hello World 3, statically\n"))
 
 (GET "/hello/:name"
      (lambda (request body :name)
@@ -54,6 +54,7 @@
        (urlencoded `((value . ,:value)))))
 
 ; rendered files
+
 
 (schingle-include-path "../../schingle")
 
