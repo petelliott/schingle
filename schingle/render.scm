@@ -14,7 +14,8 @@
             *schingle-served-directories*
             add-renderer render-file render
             serve-directory
-            serve-directory-combinator))
+            serve-directory-combinator
+            renderer-ignore))
 
 (define *schingle-renderers* (make-schingle-parameter '()))
 
@@ -94,3 +95,6 @@
       (method-not-allowed))
      (else
       (values response response-body)))))
+
+(define (renderer-ignore content)
+  #f)

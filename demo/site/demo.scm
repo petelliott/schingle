@@ -1,7 +1,5 @@
 (use-modules (schingle)
              (schingle contrib cors)
-             (schingle build)
-             (schingle context)
              (schingle template mustache))
 
 (GET "/hello"
@@ -57,15 +55,13 @@
 
 ; rendered files
 
-(schingle-include-path "../schingle")
+(schingle-include-path "../../schingle")
 
 (GET "/schingle/(.*.scm)"
      (lambda (request body filename)
        (render filename)))
 
 (add-renderer ".mustache" (mustache-renderer '((name . "peter"))))
-
-(serve-directory "./static" "/")
 
 ; templates
 
@@ -92,10 +88,3 @@
 
 (use-middleware
  (make-cors-middleware))
-
-#;(build-static-directory "./build")
-
-(with-schingle-context
- (lambda ()
-   (run-schingle
-    #:port 8080))) ; optional setting of port

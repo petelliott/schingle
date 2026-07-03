@@ -1,0 +1,121 @@
+#!/usr/bin/env -S guile -s
+!#
+
+(add-to-load-path (dirname (current-filename)))
+
+(use-modules (ice-9 getopt-long)
+             (ice-9 ftw)
+             (schingle)
+             (schingle build)
+             (schingle render)
+             (schingle load)
+             (schingle ftypes)
+             (schingle context))
+
+(define (load-site-scm site)
+  (define module (make-fresh-user-module))
+
+  (save-module-excursion
+   (lambda ()
+     (set-current-module module)
+     (use-modules (schingle))))
+
+  (ftw site
+       (lambda (filename statinfo flag)
+         (when (and (eq? flag 'regular)
+                  (equal? (file-extension filename) ".scm"))
+             (save-module-excursion
+              (lambda ()
+                (set-current-module module)
+                (load filename))))
+             #t)))
+
+(define (build site output address port)
+  (display "build is not yet implemented\n")
+  (exit 1))
+
+(define (build-static site output)
+  (with-schingle-context
+   (lambda ()
+     (load-site-scm site)
+     (build-static-directory output))))
+
+(define (run site address port)
+  (display "run is not yet implemented\n")
+  (exit 1))
+
+(define (watch site address port)
+  (display "watch is not yet implemented\n")
+  (exit 1))
+
+
+;; parse options and run.
+
+(define option-spec
+  '((include (single-char #\i) (value #t))
+    (output (single-char #\o) (value #t))
+    (port (single-char #\p) (value #t))
+    (address (single-char #\a) (value #t))
+    (help (single-char #\h) (value #f))))
+
+(define options (getopt-long (command-line) option-spec))
+
+(define* (usage #:optional (error 2))
+  (format (current-error-port) "Usage: ~a [--include <includedir> ...] {build|static|run|watch} [--port <port>] [--address <addr>] <site> [--output <build>]\n" (car (command-line)))
+  (exit error))
+
+(when (option-ref options 'help #f)
+  (usage 0))
+
+(define positional (option-ref options '() '()))
+
+(unless (= (length positional) 2)
+  (usage))
+
+(define command (car positional))
+(define dir (cadr positional))
+
+(define (ensure-output command)
+  (define output (option-ref options 'output #f))
+  (unless output
+    (format (current-error-port) "~a: output is required for command ~a\n" (car (command-line)) command)
+    (exit 1))
+  output)
+
+(define (option-ref-all options key)
+  (cond
+   ((null? options) '())
+   ((eq? (caar options) key)
+    (cons (cdar options) (option-ref-all (cdr options) key)))
+   (else
+    (option-ref-all (cdr options) key))))
+
+
+;; set up common schingle config
+(add-renderer ".scm" renderer-ignore)
+(serve-directory dir "/")
+
+(for-each
+ (lambda (include-dir)
+   (add-to-load-path include-dir)
+   (schingle-include-path include-dir))
+ (option-ref-all options 'include))
+
+
+(cond
+ ((equal? command "build")
+  (build dir (ensure-output "build")
+         (string->number (option-ref options 'port "80"))
+         (option-ref options 'address INADDR_ANY)))
+ ((equal? command "static")
+  (build-static dir (ensure-output "static")))
+ ((equal? command "run")
+  (run dir
+       (string->number (option-ref options 'port "80"))
+       (option-ref options 'address INADDR_ANY)))
+ ((equal? command "watch")
+  (run dir
+       (string->number (option-ref options 'port "80"))
+       (option-ref options 'address INADDR_ANY)))
+ (else
+  (usage)))

@@ -24,13 +24,14 @@
 
 (define (do-render-file src-dir target-dir src-filename)
   (define-values (content target-filename) (render-file src-dir src-filename))
-  (call-with-output-file (in-vicinity target-dir target-filename)
-    (lambda (port)
-      (display content port))))
+  (if content
+      (call-with-output-file (in-vicinity target-dir target-filename)
+        (lambda (port)
+          (display content port)))))
 
 (define (build-served-directory dirspec target)
   (define prefix (car dirspec))
-  (define path (cdr dirspec))
+  (define path (string-trim-right (cdr dirspec) #\/))
   (define path-len (string-length path))
   (ftw path
        (lambda (filename statinfo flag)
