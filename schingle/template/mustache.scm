@@ -2,6 +2,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-11)
   #:use-module (ice-9 regex)
+  #:use-module (ice-9 iconv)
   #:use-module (schingle util)
   #:use-module (schingle load)
   #:export (mustache-compile
@@ -153,4 +154,4 @@
 
 (define (mustache-renderer data)
   (lambda (content)
-    ((mustache-compile-string content) data)))
+    ((mustache-compile-string (bytevector->string content "UTF-8")) data)))

@@ -8,6 +8,7 @@
   #:use-module (schingle context)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 textual-ports)
+  #:use-module (ice-9 binary-ports)
   #:use-module (web uri)
   #:use-module (web request)
   #:export (*schingle-renderers*
@@ -49,7 +50,7 @@
                             (in-vicinity file "index")
                             file)))
   (if backing-file
-      (do-render (call-with-input-file backing-file get-string-all)
+      (do-render (call-with-input-file backing-file get-bytevector-all)
                  (basename backing-file))
       (values #f #f)))
 
