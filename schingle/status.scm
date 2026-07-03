@@ -1,5 +1,6 @@
 (define-module (schingle status)
   #:use-module (schingle content-type)
+  #:use-module (schingle context)
   #:export (bad-request *bad-request*
             unauthorized *unauthorized*
             forbidden *forbidden*
@@ -22,8 +23,8 @@
   (syntax-rules ()
     ((_ name parameter default-msg code)
      (begin
-       (define parameter (make-parameter (lambda (msg)
-                                           (plain (string-append (or msg default-msg) "\n") #:code code))))
+       (define parameter (make-schingle-parameter (lambda (msg)
+                                                    (plain (string-append (or msg default-msg) "\n") #:code code))))
        (define* (name #:optional (msg #f))
          ((parameter) msg))))))
 

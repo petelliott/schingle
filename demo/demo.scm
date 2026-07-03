@@ -1,6 +1,7 @@
 (use-modules (schingle)
              (schingle contrib cors)
              (schingle build)
+             (schingle context)
              (schingle template mustache))
 
 (GET "/hello"
@@ -92,7 +93,9 @@
 (use-middleware
  (make-cors-middleware))
 
-(build-static-directory "./build")
+#;(build-static-directory "./build")
 
-#;(run-schingle
- #:port 8080) ; optional setting of port
+(with-schingle-context
+ (lambda ()
+   (run-schingle
+    #:port 8080))) ; optional setting of port

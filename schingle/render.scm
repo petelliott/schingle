@@ -5,6 +5,7 @@
   #:use-module (schingle content-type)
   #:use-module (schingle ftypes)
   #:use-module (schingle status)
+  #:use-module (schingle context)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 textual-ports)
   #:use-module (web uri)
@@ -15,7 +16,7 @@
             serve-directory
             serve-directory-combinator))
 
-(define *schingle-renderers* (make-parameter '()))
+(define *schingle-renderers* (make-schingle-parameter '()))
 
 (define (add-renderer ext renderer)
   (*schingle-renderers* (acons ext renderer (*schingle-renderers*))))
@@ -63,7 +64,7 @@
 
 ;; serving whole directories
 
-(define *schingle-served-directories* (make-parameter '()))
+(define *schingle-served-directories* (make-schingle-parameter '()))
 
 (define (serve-directory path prefix)
   (*schingle-served-directories*

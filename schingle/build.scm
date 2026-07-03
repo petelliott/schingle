@@ -2,6 +2,7 @@
   #:use-module (schingle util)
   #:use-module (schingle ftypes)
   #:use-module (schingle render)
+  #:use-module (schingle context)
   #:use-module (web response)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 binary-ports)
@@ -10,7 +11,7 @@
   #:export (*schingle-static-routes*
             build-static-directory))
 
-(define *schingle-static-routes* (make-parameter '()))
+(define *schingle-static-routes* (make-schingle-parameter '()))
 
 (define (build-static-directory target)
   (delete-directory target)

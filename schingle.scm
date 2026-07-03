@@ -11,6 +11,7 @@
   #:use-module (schingle load)
   #:use-module (schingle render)
   #:use-module (schingle build)
+  #:use-module (schingle context)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static
@@ -23,7 +24,7 @@
                request-query query
                schingle-include-path))
 
-(define *schingle-routes* (make-parameter '()))
+(define *schingle-routes* (make-schingle-parameter '()))
 
 (define (route methods path proc)
   (*schingle-routes* (add-route (*schingle-routes*) methods path proc))
@@ -45,7 +46,7 @@
 (make-method-route CONNECT)
 (make-method-route PATCH)
 
-(define *schingle-serve-static* (make-parameter #t))
+(define *schingle-serve-static* (make-schingle-parameter #t))
 
 (define-syntax GET-static
   (syntax-rules ()
@@ -56,9 +57,9 @@
         (acons path (list response body)
          (*schingle-static-routes*)))))))
 
-(define *schingle-lowerware* (make-parameter '()))
-(define *schingle-middleware* (make-parameter '()))
-(define *schingle-upperware* (make-parameter '()))
+(define *schingle-lowerware* (make-schingle-parameter '()))
+(define *schingle-middleware* (make-schingle-parameter '()))
+(define *schingle-upperware* (make-schingle-parameter '()))
 
 (define (use-lowerware . combinators)
   (*schingle-lowerware* (append (reverse combinators) (*schingle-lowerware*))))

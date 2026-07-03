@@ -1,6 +1,7 @@
 (define-module (schingle load)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 binary-ports)
+  #:use-module (schingle context)
   #:export (*schingle-load-path*
             schingle-include-path
             schingle-resolve-path
@@ -8,7 +9,7 @@
             schingle-read-file
             schingle-read-file-bv))
 
-(define *schingle-load-path* (make-parameter '()))
+(define *schingle-load-path* (make-schingle-parameter '()))
 
 (define (schingle-include-path path)
   (*schingle-load-path* (cons path (*schingle-load-path*))))
