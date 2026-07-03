@@ -81,7 +81,7 @@
  500combinator)
 
 (define* (run-schingle #:key (impl 'http)
-                       (port 8080)
+                       (port 8000)
                        (addr INADDR_ANY)
                        (open-params `(#:port ,port #:addr ,addr)))
   "convinience function that combines making the handler and starting the server."

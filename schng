@@ -30,7 +30,7 @@
                 (load filename))))
              #t)))
 
-(define (build site output address port)
+(define (build site output port address)
   (display "build is not yet implemented\n")
   (exit 1))
 
@@ -40,9 +40,12 @@
      (load-site-scm site)
      (build-static-directory output))))
 
-(define (run site address port)
-  (display "run is not yet implemented\n")
-  (exit 1))
+(define (run site port address)
+  (with-schingle-context
+   (lambda ()
+     (load-site-scm site)
+     (run-schingle #:port port
+                   #:addr address))))
 
 (define (watch site address port)
   (display "watch is not yet implemented\n")
@@ -93,7 +96,8 @@
 
 ;; set up common schingle config
 (add-renderer ".scm" renderer-ignore)
-(serve-directory dir "/")
+(when (and (file-exists? dir) (file-is-directory? dir))
+  (serve-directory dir "/"))
 
 (for-each
  (lambda (include-dir)
@@ -111,11 +115,11 @@
   (build-static dir (ensure-output "static")))
  ((equal? command "run")
   (run dir
-       (string->number (option-ref options 'port "80"))
+       (string->number (option-ref options 'port "8000"))
        (option-ref options 'address INADDR_ANY)))
  ((equal? command "watch")
   (run dir
-       (string->number (option-ref options 'port "80"))
+       (string->number (option-ref options 'port "8000"))
        (option-ref options 'address INADDR_ANY)))
  (else
   (usage)))
