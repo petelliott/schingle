@@ -56,6 +56,7 @@
 
 (define option-spec
   '((include (single-char #\i) (value #t))
+    (load (single-char #\l) (value #t))
     (output (single-char #\o) (value #t))
     (port (single-char #\p) (value #t))
     (address (single-char #\a) (value #t))
@@ -64,7 +65,7 @@
 (define options (getopt-long (command-line) option-spec))
 
 (define* (usage #:optional (error 2))
-  (format (current-error-port) "Usage: ~a [--include <includedir> ...] {build|static|run|watch} [--port <port>] [--address <addr>] <site> [--output <build>]\n" (car (command-line)))
+  (format (current-error-port) "Usage: ~a [--include <includedir> ...] [--load <scm load dir> ...] {build|static|run|watch} [--port <port>] [--address <addr>] <site> [--output <build>]\n" (car (command-line)))
   (exit error))
 
 (when (option-ref options 'help #f)
@@ -101,11 +102,15 @@
 
 (for-each
  (lambda (include-dir)
-   (add-to-load-path include-dir)
    (schingle-include-path include-dir))
  (option-ref-all options 'include))
 
+(for-each
+ (lambda (load-dir)
+   (add-to-load-path load-dir))
+ (option-ref-all options 'load))
 
+;; go
 (cond
  ((equal? command "build")
   (build dir (ensure-output "build")
