@@ -28,7 +28,7 @@
              (save-module-excursion
               (lambda ()
                 (set-current-module module)
-                (load filename))))
+                (load (canonicalize-path filename)))))
              #t)))
 
 (define (build site output port address)
