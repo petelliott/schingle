@@ -5,7 +5,8 @@
   #:export (mcons
             xml-escape
             delete-directory
-            mkdir-if-not-exists dir))
+            mkdir-if-not-exists
+            mkdir-p))
 
 (define (mcons . rest)
   (if (null? (cdr rest))
@@ -31,4 +32,9 @@
 
 (define (mkdir-if-not-exists dir)
   (unless (file-exists? dir)
+    (mkdir dir)))
+
+(define (mkdir-p dir)
+  (unless (file-exists? dir)
+    (mkdir-p (dirname dir))
     (mkdir dir)))

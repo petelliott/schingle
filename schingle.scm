@@ -10,6 +10,7 @@
   #:use-module (schingle error)
   #:use-module (schingle load)
   #:use-module (schingle render)
+  #:use-module (schingle build)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static
@@ -50,9 +51,9 @@
   (syntax-rules ()
     ((_ path result)
      (let-values (((response body) result))
+       (route '(GET) path (lambda (r b) (values response body)))
        (*schingle-static-routes*
-        (cons
-         (route '(GET) path (lambda (r b) (values response body)))
+        (acons path (list response body)
          (*schingle-static-routes*)))))))
 
 (define *schingle-lowerware* (make-parameter '()))

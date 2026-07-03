@@ -44,6 +44,24 @@
             (error "can't walk file type" flag)))
          #t)))
 
+(define (content-to-file content port)
+  (cond
+   ((string? content) (display content port))
+   ((bytevector? content) (put-bytevector port content))
+   ((procedure? content) (content port))))
+
 (define (build-static-routes route target)
-  ;; TODO: build static routes
-  #f)
+  (define filename (in-vicinity target (car route)))
+  (define response (cadr route))
+  (define content (caddr route))
+  (define content-type (car (response-content-type response)))
+
+  (call-with-output-file
+      (if (eq? (extension->content-type filename) content-type)
+          filename
+          (begin
+            (mkdir-p filename)
+            (in-vicinity filename (string-append "index" (or (content-type->extension content-type)
+                                                             ".txt")))))
+    (lambda (port)
+      (content-to-file content port))))
