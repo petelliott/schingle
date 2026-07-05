@@ -24,6 +24,11 @@
       (tag-assoc (cdr alist) key))))
   (inner alist))
 
+(define (tag-assoc-proc alist-or-proc key)
+  (if (procedure? alist-or-proc)
+      (tag-assoc (alist-or-proc) key)
+      (tag-assoc alist-or-proc key)))
+
 (define text (make-parameter #f))
 (define text-i (make-parameter #f))
 
@@ -82,12 +87,12 @@
    ;; variables
    ((or (equal? type "") (equal? type "&"))
     (lambda (data blocks)
-      (render-datum (tag-assoc data key) (not (tag-noescape? nexttag)))))
+      (render-datum (tag-assoc-proc data key) (not (tag-noescape? nexttag)))))
    ;; sections
    ((equal? type "#")
     (let ((body (parse-body key)))
       (lambda (data blocks)
-        (define datum (tag-assoc data key))
+        (define datum (tag-assoc-proc data key))
         (cond
          ((vector? datum)
           (apply string-append (map (lambda (d) (body d blocks)) (vector->list datum))))
@@ -100,7 +105,7 @@
    ((equal? type "^")
     (let ((body (parse-body key)))
       (lambda (data blocks)
-        (define datum (tag-assoc data key))
+        (define datum (tag-assoc-proc data key))
         (if (or (not datum) (eq? datum '()))
             (body data blocks)
             ""))))
