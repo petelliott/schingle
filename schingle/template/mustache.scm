@@ -24,7 +24,7 @@
   (inner alist))
 
 (define (tag-assoc-list alist keylist)
-  (if (null? keylist)
+  (if (or (null? keylist) (not alist))
       alist
       (tag-assoc-list (tag-assoc1 (if (procedure? alist)
                                       (alist)
