@@ -9,9 +9,9 @@
             mustache-renderer))
 
 (define tagre
-  (make-regexp "\\{\\{(\\{?) *([&#^/>$<]?) *([a-zA-Z0-9]+) *\\}\\}\\}?"))
+  (make-regexp "\\{\\{(\\{?) *([&#^/>$<]?) *([-a-zA-Z0-9.]+) *\\}\\}\\}?"))
 
-(define (tag-assoc alist key)
+(define (tag-assoc1 alist key)
   (define sym (string->symbol key))
   (define (inner alist)
     (cond
@@ -23,10 +23,20 @@
       (tag-assoc (cdr alist) key))))
   (inner alist))
 
-(define (tag-assoc-proc alist-or-proc key)
-  (if (procedure? alist-or-proc)
-      (tag-assoc (alist-or-proc) key)
-      (tag-assoc alist-or-proc key)))
+(define (tag-assoc-list alist keylist)
+  (if (null? keylist)
+      alist
+      (tag-assoc-list (tag-assoc1 (if (procedure? alist)
+                                      (alist)
+                                      alist)
+                                  (car keylist))
+                      (cdr keylist))))
+
+(define (tag-assoc alist-or-proc key)
+  (tag-assoc-list alist-or-proc
+                  (if (equal? key ".")
+                      '()
+                      (string-split key #\.))))
 
 (define text (make-parameter #f))
 (define text-i (make-parameter #f))
@@ -86,12 +96,12 @@
    ;; variables
    ((or (equal? type "") (equal? type "&"))
     (lambda (data blocks)
-      (render-datum (tag-assoc-proc data key) (not (tag-noescape? nexttag)))))
+      (render-datum (tag-assoc data key) (not (tag-noescape? nexttag)))))
    ;; sections
    ((equal? type "#")
     (let ((body (parse-body key)))
       (lambda (data blocks)
-        (define datum (tag-assoc-proc data key))
+        (define datum (tag-assoc data key))
         (cond
          ((vector? datum)
           (apply string-append (map (lambda (d) (body d blocks)) (vector->list datum))))
@@ -104,7 +114,7 @@
    ((equal? type "^")
     (let ((body (parse-body key)))
       (lambda (data blocks)
-        (define datum (tag-assoc-proc data key))
+        (define datum (tag-assoc data key))
         (if (or (not datum) (eq? datum '()))
             (body data blocks)
             ""))))
