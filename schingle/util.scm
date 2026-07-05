@@ -2,11 +2,13 @@
 (define-module (schingle util)
   #:use-module (sxml simple)
   #:use-module (ice-9 ftw)
+  #:use-module (ice-9 iconv)
   #:export (mcons
             xml-escape
             delete-directory
             mkdir-if-not-exists
-            mkdir-p))
+            mkdir-p
+            string/bytevector->string))
 
 (define (mcons . rest)
   (if (null? (cdr rest))
@@ -38,3 +40,8 @@
   (unless (file-exists? dir)
     (mkdir-p (dirname dir))
     (mkdir dir)))
+
+(define (string/bytevector->string string-or-bytevector)
+  (if (string? string-or-bytevector)
+      string-or-bytevector
+      (bytevector->string string-or-bytevector "UTF-8")))
