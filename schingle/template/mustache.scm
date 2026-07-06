@@ -109,6 +109,8 @@
           ;; TODO: pass literal block unredered
           (datum (body data blocks)))
          ((not datum) "")
+         ((boolean? datum)
+          (body data blocks))
          (else (body datum blocks))))))
    ;; inverted sections
    ((equal? type "^")
