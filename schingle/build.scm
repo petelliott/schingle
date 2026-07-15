@@ -27,7 +27,7 @@
   (if content
       (call-with-output-file (in-vicinity target-dir target-filename)
         (lambda (port)
-          (display content port)))))
+          (content-to-file content port)))))
 
 (define (build-served-directory dirspec target)
   (define prefix (car dirspec))
