@@ -13,7 +13,7 @@
   #:use-module (web request)
   #:export (*schingle-renderers*
             *schingle-served-directories*
-            add-renderer render-file render
+            add-renderer render-file render-content render
             serve-directory
             serve-directory-combinator
             renderer-ignore))
@@ -33,12 +33,12 @@
       (in-vicinity (dirname file) f)))
    (else #f)))
 
-(define (do-render content filename)
+(define (render-content content filename)
   (define next-renderer (find (lambda (renderer)
                                 (string-suffix? (car renderer) filename))
                               (*schingle-renderers*)))
   (if next-renderer
-      (do-render ((cdr next-renderer) content)
+      (render-content ((cdr next-renderer) content)
                  (string-drop-right filename
                                     (string-length (car next-renderer))))
       (values content filename)))
@@ -50,7 +50,7 @@
                             (in-vicinity file "index")
                             file)))
   (if backing-file
-      (do-render (call-with-input-file backing-file get-bytevector-all)
+      (render-content (call-with-input-file backing-file get-bytevector-all)
                  (basename backing-file))
       (values #f #f)))
 
