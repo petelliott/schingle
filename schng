@@ -213,18 +213,18 @@
 (cond
  ((equal? command "build")
   (build dir (ensure-output "build")
-         (string->number (option-ref options 'port "80"))
-         (option-ref options 'address INADDR_ANY)))
+         (string->number (option-ref options 'port "8000"))
+         (option-ref options 'address "127.0.0.1")))
  ((equal? command "static")
   (build-static dir (ensure-output "static")))
  ((equal? command "run")
   (run dir
        (string->number (option-ref options 'port "8000"))
-       (option-ref options 'address INADDR_ANY)))
+       (option-ref options 'address "127.0.0.1")))
  ((equal? command "watch")
   (watch dir
        (string->number (option-ref options 'port "8000"))
-       (option-ref options 'address INADDR_ANY)
+       (option-ref options 'address "127.0.0.1")
        (append (list dir)
                (option-ref-all options 'include)
                (option-ref-all options 'load))))

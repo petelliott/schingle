@@ -9,7 +9,8 @@
             mkdir-if-not-exists
             mkdir-p
             copy-file-p
-            string/bytevector->string))
+            string/bytevector->string
+            maybe))
 
 (define (mcons . rest)
   (if (null? (cdr rest))
@@ -50,3 +51,8 @@
   (if (string? string-or-bytevector)
       string-or-bytevector
       (bytevector->string string-or-bytevector "UTF-8")))
+
+(define (maybe proc value)
+  (if value
+      (proc value)
+      value))

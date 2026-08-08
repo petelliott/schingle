@@ -83,11 +83,16 @@
  500combinator
  logging-combinator)
 
+(define (open-addr-params str)
+  (define addrinfo (car (getaddrinfo str "http")))
+  `(#:family ,(addrinfo:fam addrinfo)
+             #:addr ,(sockaddr:addr (addrinfo:addr addrinfo))))
+
 (define* (run-schingle #:key (impl 'http)
                        (port 8000)
-                       (addr INADDR_ANY)
-                       (open-params `(#:port ,port #:addr ,addr)))
-  "convinience function that combines making the handler and starting the server."
+                       (addr "127.0.0.1")
+                       (open-params `(#:port ,(or (maybe string->number (getenv "SCHINGLE_PORT")) port)
+                                      ,@(open-addr-params (or (getenv "SCHINGLE_ADDR") addr)))))
   (run-server (apply-combinators (append (*schingle-upperware*)
                                          (*schingle-middleware*)
                                          (*schingle-lowerware*)))
