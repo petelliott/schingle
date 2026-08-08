@@ -4,6 +4,7 @@
   #:use-module (schingle context)
   #:export (*schingle-load-path*
             schingle-include-path
+            schingle-include-relative
             schingle-resolve-path
             call-with-schingle-input-file
             schingle-read-file
@@ -13,6 +14,11 @@
 
 (define (schingle-include-path path)
   (*schingle-load-path* (cons path (*schingle-load-path*))))
+
+(define-syntax schingle-include-relative
+  (syntax-rules ()
+    ((_ path)
+     (schingle-include-path (in-vicinity (dirname (current-filename)) path)))))
 
 (define (schingle-resolve-path path)
   (define (first-exists dirs)

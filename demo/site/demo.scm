@@ -56,7 +56,7 @@
 ; rendered files
 
 
-(schingle-include-path "../../schingle")
+(schingle-include-relative "../../schingle")
 
 (GET "/schingle/(.*.scm)"
      (lambda (request body filename)
@@ -67,7 +67,7 @@
 ; templates
 
 ; templates are rendered from schingle's include path
-(schingle-include-path "./")
+(schingle-include-relative "./")
 
 (define template (mustache-compile "template.html.mustache"))
 

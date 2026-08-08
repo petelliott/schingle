@@ -23,7 +23,7 @@
   #:re-export (plain json xml html sexp urlencoded redirect content
                serve-directory add-renderer render
                request-query query
-               schingle-include-path
+               schingle-include-path schingle-include-relative
                schingle-logging))
 
 (define *schingle-routes* (make-schingle-parameter '()))
