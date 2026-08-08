@@ -6,14 +6,16 @@
 (use-modules (ice-9 getopt-long)
              (ice-9 ftw)
              (ice-9 threads)
+             (ice-9 textual-ports)
              (schingle)
+             (schingle util)
              (schingle build)
              (schingle render)
              (schingle load)
              (schingle ftypes)
              (schingle context))
 
-(define (load-site-scm site)
+(define* (load-site-scm site #:optional (proc identity))
   (define module (make-fresh-user-module))
 
   (save-module-excursion
@@ -24,16 +26,95 @@
   (ftw site
        (lambda (filename statinfo flag)
          (when (and (eq? flag 'regular)
-                  (equal? (file-extension filename) ".scm"))
+                    (equal? (file-extension filename) ".scm"))
+             (proc filename)
              (save-module-excursion
               (lambda ()
                 (set-current-module module)
                 (load (canonicalize-path filename)))))
-             #t)))
+         #t))
+
+  module)
+
+(define* (collect-scm target module #:optional seen)
+  ;; we're using some undocumented functions here, don't worry
+  (define seen-table (or seen (make-hash-table)))
+  (define file (module-filename module))
+  (unless (hash-ref seen-table module)
+    (hash-set! seen-table module #t)
+    (let ((full-path (and file (search-path %load-path file))))
+      (when (or (not full-path)
+                ;; we need to skip system libraries
+                (not (string=? full-path (in-vicinity (%library-dir) file))))
+        (when file
+          (copy-file-p full-path (in-vicinity target file)))
+        (for-each (lambda (interface)
+                    (collect-scm target (resolve-module (module-name interface)) seen-table))
+                  (module-uses module))))))
+
+(define (collect-include target include)
+  (define path (string-trim-right include #\/))
+  (define path-len (string-length path))
+  (ftw include
+       (lambda (filename statinfo flag)
+         (define rel (substring filename path-len))
+         (define dest (in-vicinity target rel))
+         (unless (file-exists? dest)
+           (case flag
+             ((regular)
+              (copy-file filename dest))
+             ((directory)
+              (mkdir dest))
+             (else
+              (error "can't walk file type" flag))))
+         #t)))
+
+(define (collect-includes target includes)
+  (for-each (lambda (i)
+              (collect-include target i))
+            includes))
+
+
+(define (generate-run-file filename port address)
+  (call-with-output-file filename
+    (lambda (output)
+      (display "#!/usr/bin/env -S guile -s\n!#\n" output)
+      (write '(add-to-load-path (in-vicinity (dirname (current-filename)) "modules")) output)
+      (newline output)
+      (write '(use-modules (schingle)) output)
+      (newline output)
+      (write '(schingle-include-relative "./include") output)
+      (newline output)
+      (write '(load "site.scm") output)
+      (newline output)
+      (write `(run-schingle #:port ,port #:addr ,address) output)
+      (newline output)))
+  (chmod filename #o755))
 
 (define (build site output port address)
-  (display "build is not yet implemented\n")
-  (exit 1))
+  (delete-directory output)
+  (mkdir-p output)
+
+  (with-schingle-context
+   (lambda ()
+     ;; load root scm and compile it into one file
+     (define module (call-with-output-file (in-vicinity output "site.scm")
+                      (lambda (oport)
+                        (load-site-scm site (lambda (file)
+                                              (format oport ";;;;; pasted from ~a\n" file)
+                                              (call-with-input-file file
+                                                (lambda (iport)
+                                                  ;; TODO find a better way of doing this
+                                                  (display (get-string-all iport) oport))))))))
+     ;; gather all guile dependencies
+     (collect-scm (in-vicinity output "modules") module)
+     ;; build static site
+     (build-static-directory (in-vicinity output "static"))
+     ;; copy include dirs
+     (collect-includes (in-vicinity output "include") (*schingle-load-path*))
+     ;; generate the run file
+     (generate-run-file (in-vicinity output "run.scm") port address))))
+
 
 (define (build-static site output)
   (with-schingle-context
@@ -56,8 +137,6 @@
         (thunk)
         (exit 0))
       pid))
-
-
 
 (define (watch site port address watch-dirs)
   (define pid (jank-subprocess

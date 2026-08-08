@@ -8,6 +8,7 @@
             delete-directory
             mkdir-if-not-exists
             mkdir-p
+            copy-file-p
             string/bytevector->string))
 
 (define (mcons . rest)
@@ -40,6 +41,10 @@
   (unless (file-exists? dir)
     (mkdir-p (dirname dir))
     (mkdir dir)))
+
+(define (copy-file-p src dst)
+  (mkdir-p (dirname dst))
+  (copy-file src dst))
 
 (define (string/bytevector->string string-or-bytevector)
   (if (string? string-or-bytevector)
