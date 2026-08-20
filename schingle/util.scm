@@ -29,10 +29,12 @@
               (case flag
                 ((directory-processed)
                  (rmdir filename))
+                ((symlink)
+                 (delete-file filename))
                 (else
                  (delete-file filename)))
               #t)
-            'depth)))
+            'depth 'physical)))
 
 (define (mkdir-if-not-exists dir)
   (unless (file-exists? dir)
