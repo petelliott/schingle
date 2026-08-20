@@ -10,9 +10,9 @@
   #:use-module (schingle error)
   #:use-module (schingle load)
   #:use-module (schingle render)
-  #:use-module (schingle build)
   #:use-module (schingle context)
   #:use-module (schingle logging)
+  #:use-module (schingle static)
   #:export (GET HEAD POST PUT DELETE TRACE
             OPTIONS CONNECT PATCH
             GET-static

@@ -3,15 +3,14 @@
   #:use-module (schingle ftypes)
   #:use-module (schingle render)
   #:use-module (schingle context)
+  #:use-module (schingle static)
   #:use-module (web response)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 binary-ports)
   #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-11)
-  #:export (*schingle-static-routes*
-            build-static-directory))
+  #:export (build-static-directory))
 
-(define *schingle-static-routes* (make-schingle-parameter '()))
 
 (define (build-static-directory target)
   (delete-directory target)
