@@ -13,6 +13,7 @@
              (schingle render)
              (schingle load)
              (schingle ftypes)
+             (schingle build cachebust)
              (schingle context))
 
 (define* (load-site-scm site #:optional (proc identity))
@@ -110,6 +111,7 @@
      (collect-scm (in-vicinity output "modules") module)
      ;; build static site
      (build-static-directory (in-vicinity output "static"))
+     (cachebust-static-dir (in-vicinity output "static"))
      ;; copy include dirs
      (collect-includes (in-vicinity output "include") (*schingle-load-path*))
      ;; generate the run file

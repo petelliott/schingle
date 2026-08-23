@@ -1,5 +1,6 @@
 ;;; utilities that are not schingle specific
 (define-module (schingle util)
+  #:use-module (rnrs bytevectors)
   #:use-module (sxml simple)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 iconv)
@@ -10,6 +11,7 @@
             mkdir-p
             copy-file-p
             string/bytevector->string
+            string/bytevector->bytevector
             maybe))
 
 (define (mcons . rest)
@@ -53,6 +55,11 @@
   (if (string? string-or-bytevector)
       string-or-bytevector
       (bytevector->string string-or-bytevector "UTF-8")))
+
+(define (string/bytevector->bytevector string-or-bytevector)
+  (if (bytevector? string-or-bytevector)
+      string-or-bytevector
+      (string->bytevector string-or-bytevector "UTF-8")))
 
 (define (maybe proc value)
   (if value

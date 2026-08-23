@@ -2,6 +2,7 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 regex)
   #:export (file-extension
+            tag-filename
             full-file-extension
             extension->content-type
             content-type->extension))
@@ -113,6 +114,10 @@
   (if match
       (match:substring match)
       ""))
+
+(define (tag-filename filename tag)
+  (regexp-substitute #f (regexp-exec last-ext-reg filename)
+                     'pre "." tag 0 'post))
 
 (define full-ext-reg (make-regexp "\\.[^/]*$"))
 
